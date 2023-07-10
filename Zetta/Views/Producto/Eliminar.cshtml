@@ -1,0 +1,113 @@
+﻿@model Zetta.Models.Producto
+
+@{
+    var titulo = "Esta seguro de Eliminar el Producto?";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form method="post" asp-action="Eliminar">
+    <input asp-for="Id" hidden />
+
+    <div class="border p-3">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group row">
+            <h2 class="text-danger pl-3">@titulo</h2>
+        </div>
+        <hr />
+
+        <div class="row">
+            <div class="col-8">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label asp-for="Codigo" class="form-label">Código</label>
+                            <input asp-for="Codigo" disable class="form-control" />
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label asp-for="Nombre" class="form-label">Nombre</label>
+                            <input asp-for="Nombre" disable class="form-control" />
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label asp-for="MarcaId" class="form-label">Marca</label>
+                            <input asp-for="MarcaId" hidden class="form-control" />
+                            <input asp-for="Marca.Nombre" disable class="form-control" />
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label asp-for="CategoriaId" class="form-label">Categoria</label>
+                            <input asp-for="CategoriaId" hidden class="form-control" />
+                            <input asp-for="Categoria.Nombre" disable class="form-control" />
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row" hidden>
+                        <div class="col-md-6">
+                            <label asp-for="Descripcion" class="form-label">Descripcion del Producto</label>
+                            <textarea asp-for="Descripcion" class="form-control summernote"></textarea>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row" hidden>
+                        <div class="col-md-6">
+                            <label asp-for="ImagenUrl" class="form-label">Imagen</label>
+                            <input asp-for="ImagenUrl" class="form-control" />
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label asp-for="Costo" class="form-label">Costo</label>
+                            <input asp-for="Costo" disable class="form-control" />
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label asp-for="Margen" class="form-label">Margen</label>
+                            <input asp-for="Margen" disable class="form-control" />
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label asp-for="Precio" class="form-label">Precio</label>
+                            <input asp-for="Precio" disable class="form-control" />
+                        </div>
+                    </div>
+                    <br />
+
+
+                    <div class="row p-1">
+                        <div class="col-6 col-md-3">
+                            <button type="submit" class="btn btn-danger form-control">Eliminar</button>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a asp-controller="Producto" asp-action="Index" class="btn btn-success form-control">Regresar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                @if (Model.Id != 0)
+                {
+                    <img src="@WC.ImagenRuta@Model.ImagenUrl" width="100%" style="border-radius:5px; border:1px solid #bbb" />
+                    @* <img src="~/imagenes/productos/77cc75b4-3706-4919-9932-163f9755f8a0.jpg" />*@
+                }
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

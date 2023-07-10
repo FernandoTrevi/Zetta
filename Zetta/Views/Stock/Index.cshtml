@@ -1,0 +1,106 @@
+﻿@model Zetta.Models.ViewModels.StockVM
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="border p-3">
+    <div class="form-group row">
+        <h2>Actualizar Stock</h2>
+    </div>
+    <hr />
+
+    <div class="row">
+        <div class="col-8">
+            <div class="container">
+                <form asp-action="Index" method="post">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label asp-for="FechaActual">Fecha Actual</label>
+                            <input asp-for="FechaActual" class="form-control" readonly />
+                        </div>
+                    </div>
+                    <br />
+                    @if(Model.ProductoNombre == null){
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label asp-for="ProductoId" class="form-label">Producto</label>
+                            <select asp-for="ProductoId" asp-items="@Model.ProductoLista" class="form-select">
+                                <option disabled selected>--Seleccione un Producto--</option>
+
+                            </select>
+                            <span asp-validation-for="ProductoId" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                    }else{
+                        <div class="col-md-6">
+                            <label asp-for="ProductoId" class="form-label">Producto</label>
+                            <select asp-for="ProductoId" asp-items="@Model.ProductoLista" class="form-select">
+                                @foreach (var item in Model.ProductoLista)
+                                {
+                                    if (item.Text == Model.ProductoNombre)
+                                    {
+                                        <option value="@item.Value" selected>@item.Text</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="ProductoId" class="text-danger"></span>
+                        </div>
+                    }
+                    <br />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label asp-for="Cantidad">Cantidad</label>
+                            <input asp-for="Cantidad" class="form-control" />
+                            <span asp-validation-for="Cantidad" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label asp-for="Concepto" class="form-label">Concepto</label>
+                            <select asp-for="Concepto" asp-items="@Model.ConceptoLista" class="form-select">
+                                <option disabled selected>--Seleccione un concepto--</option>
+                            </select>
+                            <span asp-validation-for="Concepto" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <br />
+
+                    <div class="row p-1">
+                        <div class="col-6 col-md-3">
+                            <button type="submit" class="btn btn-primary">Confirmar</button>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a asp-controller="Producto" asp-action="Index" class="btn btn-secondary">Regresar</a>
+                         @* <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Regresar</a>*@
+                        </div>
+                    </div>
+                </form>
+                <div>
+                    @if (Model.ErrorMessages != null && Model.ErrorMessages.Count > 0)
+                    {
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach (var errorMessage in Model.ErrorMessages)
+                                {
+                                    <li>@errorMessage</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+             </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
