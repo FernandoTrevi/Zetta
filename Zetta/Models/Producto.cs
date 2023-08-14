@@ -43,5 +43,7 @@ namespace Zetta.Models
 
         public int Stock { get; set; }
 
+
+
     }
 }

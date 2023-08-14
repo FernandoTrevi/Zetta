@@ -2,9 +2,6 @@
 @using System.Globalization;
 @model Paginacion<Zetta.Models.Producto>
 
-@*@model IEnumerable<Zetta.Models.Producto>
-*@
-
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -22,13 +19,6 @@
         </div>
     </div>
 
-    @*<form asp-controller="Categoria" asp-action="Index">
-        <p>
-            Buscar: <input type="text" name="buscar" class="form-text" value="@ViewData["Buscar"]" />
-            <input type="submit" value="Buscar" class="btn btn-sm btn-dark" />
-        </p>
-    </form>*@
-
     <form asp-controller="Producto" asp-action="Index">
         <p>
             Buscar: <input type="text" name="buscar" class="form-text" />
@@ -36,22 +26,28 @@
         </p>
     </form>
     <button onclick="goBack()" class="btn btn-primary">Volver</button>
-
+@*    <a asp-controller="Producto" asp-action="Index" class="btn btn-primary">Volver</a>
+*@
 
     <hr />
     <br />
 
     @if (Model.Count() > 0)
     {
-        <table class="table table-bordered table-striped table-hover" style="width:100%">
+        <table class="table table-bordered table-striped" style="width:100%">
             <thead>
                 <tr class="table-dark text-center">
                     <th>
-                        Código
+                        <a asp-action="Index" asp-route-ordenActual="@ViewData["FiltroCodigo"]">
+                            <span class="column-header">Código</span>
+                        </a>
                     </th>
 
                     <th>
-                        Nombre
+                        <a asp-action="Index" asp-route-ordenActual="@ViewData["FiltroNombre"]">
+                            <span class="column-header">Nombre</span>
+                        </a>
+                        
                     </th>
 
                     <th>
@@ -82,24 +78,28 @@
                         <td>@item.Nombre</td>
                         <td class="text-center">@item.Marca.Nombre</td>
                         <td class="text-center">@item.Categoria.Nombre</td>
-                         <td class="text-end">@item.Precio.ToString("N2")</td>
-                        <td class="text-center">@item.Stock</td>
+                        <td class="text-end">@item.Precio.ToString("N2")</td>
                         <td class="text-center">
-                            <div class="w-75 btn-group" role="group">
-                                <a asp-controller="Producto" asp-action="Upsert" asp-route-Id="@item.Id" class="btn btn-primary mx-2">
-                                    <i class="bi bi-pencil-square bi-xs"></i>
+                            @item.Stock
+                           @* @if (@item.AlertaStock && item.Stock < item.StockMinimo)
+                            {
+                                <i class="bi bi-exclamation-circle icono-advertencia"></i>
+                            }*@
+                        </td>
+                        <td class="text-center">
+                            <div class="w-100 btn-group d-flex justify-content-center" role="group">
+                                <a asp-controller="Producto" asp-action="Upsert" asp-route-Id="@item.Id" class="btn btn-primary mx-2" data-toggle="tooltip" data-placement="top" title="Editar">
+                                    <i class="bi bi-pencil-square"></i>
                                 </a>
 
-                                <a asp-controller="Producto" asp-action="Eliminar" asp-route-Id="@item.Id" class="btn btn-danger mx-2">
-                                    <i class="bi bi-trash bi-xs"></i>
+                                <a asp-controller="Producto" asp-action="Eliminar" asp-route-Id="@item.Id" class="btn btn-danger mx-2" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
                                 </a>
 
                                 <a asp-controller="Stock" asp-action="VerStock" asp-route-Id="@item.Id" class="btn btn-info mx-2" data-toggle="tooltip" data-placement="top" title="Ver Stock">
-                                    <i class="bi bi-box bi-xs"></i>
+                                    <i class="bi bi-box"></i>
                                 </a>
-
                             </div>
-
                         </td>
                     </tr>
                 }
@@ -137,36 +137,6 @@
                 </nav>
             </div>
         </div>
-
-
-        <!-- Paginación -->
-        @*<div class="row">
-            <div class="col-md-12">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination justify-content-center">
-                        @if (Model.PaginasAnteriores)
-                        {
-                            <li class="page-item">
-                                <a class="page-link" href="@Url.Action("Index", new { numpag = Model.PaginaInicio - 1 })">Anterior</a>
-                            </li>
-                        }
-                        @for (int i = 1; i <= Model.PaginasTotales; i++)
-                        {
-                            <li class="page-item @(i == Model.PaginaInicio ? "active" : "")">
-                                <a class="page-link" href="@Url.Action("Index", new { numpag = i })">@i</a>
-                            </li>
-                        }
-                        @if (Model.PaginasPosteriores)
-                        {
-                            <li class="page-item">
-                                <a class="page-link" href="@Url.Action("Index", new { numpag = Model.PaginaInicio + 1 })">Siguiente</a>
-                            </li>
-                        }
-                    </ul>
-                </nav>
-            </div>
-        </div>*@
-        <!-- Fin Paginación -->
     }
     else
     {
@@ -179,3 +149,8 @@
         window.history.back();
     }
 </script>
+<style>
+    .column-header {
+        color: white;
+    }
+</style>

@@ -32,33 +32,20 @@ namespace Zetta.Controllers
                 query = query.Where(c => c.Nombre.ToLower().Contains(buscar.ToLower()));
             }
 
+            query = query.OrderBy(m => m.Nombre); // Ordenar alfabéticamente por nombre
+
             int cantidadregistros = 5;
             var paginacion = await Paginacion<Categoria>.CrearPaginacion(query, numpag ?? 1, cantidadregistros);
 
             return View(paginacion);
         }
 
-        //public IActionResult Index(string buscar)
-        //{
-        //    IEnumerable<Categoria> lista = _db.Categoria;
+        
 
-        //    if (!String.IsNullOrEmpty(buscar))
-        //    {
-        // Se convierte tanto el nombre de la categoría como el término de búsqueda a minúsculas utilizando el método ToLower(). De esta manera,
-        // la búsqueda se realiza sin tener en cuenta las mayúsculas o minúsculas. Ademásla consulta se realizará utilizando el método Contains
-        // para verificar si el nombre de la categoría contiene la parte ingresada por el usuario.
-        //        lista = lista.Where(c => c.Nombre.ToLower().Contains(buscar.ToLower()));
-        //    }
-
-        //    lista = lista.OrderBy(c => c.Nombre);
-
-        //    return View(lista);
-        //}
-
-        //public IActionResult Crear()
-        //{
-        //    return View();
-        //}
+        public IActionResult Crear()
+        {
+            return View();
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]

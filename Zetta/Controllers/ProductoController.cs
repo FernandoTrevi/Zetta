@@ -24,20 +24,42 @@ namespace Zetta.Controllers
         }
 
         // GET: Producto
-        public async Task<IActionResult> Index(string buscar, int? numpag, string filtroActual)
+        // GET: Producto
+        public async Task<IActionResult> Index(string buscar, string ordenActual, int? numpag, string filtroActual)
         {
             IQueryable<Producto> query = _db.Producto.Include(m => m.Marca).Include(c => c.Categoria);
+
 
             if (buscar != null)
                 numpag = 1;
             else
                 buscar = filtroActual;
 
+            ViewData["OrdenActual"] = ordenActual;
             ViewData["FiltroActual"] = buscar;
 
             if (!String.IsNullOrEmpty(buscar))
             {
                 query = query.Where(p => p.Nombre.Contains(buscar) || p.Codigo.Contains(buscar));
+            }
+
+            ViewData["FiltroNombre"] = String.IsNullOrEmpty(ordenActual) ? "NombreDescendente" : "";
+            ViewData["FiltroCodigo"] = ordenActual == "CodigoAscendente" ? "CodigoDescendente" : "CodigoAscendente";
+
+            switch (ordenActual)
+            {
+                case "NombreDescendente":
+                    query = query.OrderByDescending(producto => producto.Nombre);
+                    break;
+                case "CodigoDescendente":
+                    query = query.OrderByDescending(producto => producto.Codigo);
+                    break;
+                case "CodigoAscendente":
+                    query = query.OrderBy(producto => producto.Codigo);
+                    break;
+                default:
+                    query = query.OrderBy(producto => producto.Nombre);
+                    break;
             }
 
             int cantidadregistros = 5;
