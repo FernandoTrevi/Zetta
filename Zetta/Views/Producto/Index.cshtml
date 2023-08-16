@@ -18,6 +18,19 @@
             </a>
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-12">
+            @if (Model.Any(item => item.Stock < item.StockMinimo))
+            {
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    Existen productos con bajo stock.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="btn btn-outline-primary " onclick="$('#lowStockModal').modal('show');">Ver</button>
+                </div>
+            }
+        </div>
+    </div>
+
 
     <form asp-controller="Producto" asp-action="Index">
         <p>
@@ -73,7 +86,7 @@
             <tbody>
                 @foreach (var item in Model)
                 {
-                    <tr>
+                    <tr id="producto-@item.Id" class="@(item.Stock < item.StockMinimo ? "low-stock" : "")">
                         <td>@item.Codigo</td>
                         <td>@item.Nombre</td>
                         <td class="text-center">@item.Marca.Nombre</td>
@@ -142,15 +155,98 @@
     {
         <p>No hay registros de Productos</p>
     }
+   @* <div id="productosBajoStock" class="mt-4">
+        <h3>Productos con Bajo Stock</h3>
+        <table class="table table-bordered table-striped" style="width:100%">
+            <thead>
+                <tr class="table-dark text-center">
+                    <th>
+                        Codigo
+                    </th>
+                    <th>
+                        Producto
+                    </th>
+                    <th>
+                        Stock Mínimo
+                    </th>
+                    <th>
+                        Stock Actual
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Where(p => p.Stock < p.StockMinimo))
+                {
+                    <tr>
+                        <td>@item.Codigo</td>
+                        <td>@item.Nombre</td>
+                        <td>@item.StockMinimo</td>
+                        <td>@item.Stock</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>*@
+    <div class="modal" id="lowStockModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-xl" role="document">
+            <!-- Agregado: modal-lg para hacerlo más grande -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Productos con Bajo Stock</h5>
+                    <button onclick="$('#lowStockModal').modal('hide');" type="button" class="close" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered table-striped" style="width:100%">
+                        <thead>
+                            <tr class="table-dark text-center">
+                                <th>Codigo</th>
+                                <th>Producto</th>
+                                <th>Stock Mínimo</th>
+                                <th>Stock Actual</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Where(p => p.Stock < p.StockMinimo))
+                            {
+                                <tr>
+                                    <td>@item.Codigo</td>
+                                    <td>@item.Nombre</td>
+                                    <td>@item.StockMinimo</td>
+                                    <td>@item.Stock</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="$('#lowStockModal').modal('hide');" type="button" class="btn btn-secondary">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
     function goBack() {
         window.history.back();
     }
+
+    //$(document).ready(function () {
+    //    $('#openLowStockModal').click(function () {
+    //        $('#lowStockModal').modal('show');
+    //    });
+    //});
 </script>
+
 <style>
     .column-header {
         color: white;
+    }
+
+    .low-stock {
+        background-color: #ffb3b3;
     }
 </style>

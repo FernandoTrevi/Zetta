@@ -121,6 +121,8 @@ namespace Zetta.Controllers
                     Text = c.Nombre,
                     Value = c.Id.ToString()
                 })
+                
+                
             };
 
 
@@ -196,6 +198,11 @@ namespace Zetta.Controllers
                     {
                         productoVM.Producto.ImagenUrl = objProducto.ImagenUrl;
                     }
+
+                    // Copiar el valor existente de Stock al objeto productoVM.Producto
+                    productoVM.Producto.Stock = objProducto.Stock;
+
+                    // Realizar la actualización del producto en la base de datos
                     _db.Producto.Update(productoVM.Producto);
 
                 }
