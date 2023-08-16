@@ -9,6 +9,18 @@
         <h2>Actualizar Stock</h2>
     </div>
     <hr />
+    @if (TempData["Mensaje"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Mensaje"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
 
     <div class="row">
         <div class="col-8">
@@ -60,6 +72,7 @@
                             <span asp-validation-for="Cantidad" class="text-danger"></span>
                         </div>
                     </div>
+
                     <br />
                     <div class="row">
                         <div class="col-md-6">
