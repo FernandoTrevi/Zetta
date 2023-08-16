@@ -47,35 +47,48 @@ namespace Zetta1.Controllers
 
                 if (producto != null)
                 {
+                    int newStock = producto.Stock;
+
                     // Actualizar el stock del producto según el concepto seleccionado
                     if (stockVM.Concepto == "Ingreso de producto" || stockVM.Concepto == "Compras" || stockVM.Concepto == "Devoluciones")
                     {
-                        producto.Stock += stockVM.Cantidad;
+                        newStock += stockVM.Cantidad;
                     }
                     else
                     {
-                        producto.Stock -= stockVM.Cantidad;
+                        newStock -= stockVM.Cantidad;
+
+                        if (newStock < 0)
+                        {
+                            TempData["ErrorMessage"] = "No se puede realizar esta operación. Stock insuficiente.";
+                        }
                     }
 
-                    // Guardar los cambios en la base de datos
-                    var stock = new Stock
+                    if (newStock >= 0)
                     {
-                        ProductoId = stockVM.ProductoId,
+                        producto.Stock = newStock;
 
-                        Cantidad = stockVM.Cantidad,
-                        Fecha = stockVM.FechaActual,
-                        Concepto = stockVM.Concepto
-                    };
+                        // Guardar los cambios en la base de datos
+                        var stock = new Stock
+                        {
+                            ProductoId = stockVM.ProductoId,
+                            Cantidad = stockVM.Cantidad,
+                            Fecha = stockVM.FechaActual,
+                            Concepto = stockVM.Concepto
+                        };
 
-                    _context.Add(stock);
-                    _context.SaveChanges();
-                    // Mostrar mensaje de confirmación
-                    TempData["Mensaje"] = "El stock se ha actualizado correctamente.";
+                        _context.Add(stock);
+                        _context.SaveChanges();
+
+                        // Mostrar mensaje de confirmación
+                        TempData["Mensaje"] = "El stock se ha actualizado correctamente.";
+                    }
                 }
 
                 // Redireccionar al caso de uso "Gestionar Productos"
                 return RedirectToAction("Index");
             }
+
 
             // El modelo no es válido, obtener los mensajes de error
             var errors = ModelState.Values.SelectMany(v => v.Errors)
