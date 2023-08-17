@@ -16,5 +16,7 @@ namespace Zetta.Datos
         public DbSet<Producto> Producto { get; set; }
         public DbSet<Stock> Stock { get; set; }
         public DbSet<UsuarioAplicacion> UsuarioAplicacion { get; set; }
+        public DbSet<CondIva> CondIva { get; set; }
+        public DbSet<Provincia> Provincia { get; set; }
     }
 }

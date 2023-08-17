@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Zetta.Datos;
 
@@ -11,9 +12,10 @@ using Zetta.Datos;
 namespace Zetta.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230815234833_agregarProvinciaABD")]
+    partial class agregarProvinciaABD
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -314,13 +316,7 @@ namespace Zetta.Migrations
                     b.Property<double>("Precio")
                         .HasColumnType("float");
 
-                    b.Property<bool>("Publicado")
-                        .HasColumnType("bit");
-
                     b.Property<int>("Stock")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StockMinimo")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

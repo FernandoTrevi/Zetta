@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Zetta.Datos;
 
@@ -11,9 +12,10 @@ using Zetta.Datos;
 namespace Zetta.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230815232227_agregarConIvaABD")]
+    partial class agregarConIvaABD
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -314,13 +316,7 @@ namespace Zetta.Migrations
                     b.Property<double>("Precio")
                         .HasColumnType("float");
 
-                    b.Property<bool>("Publicado")
-                        .HasColumnType("bit");
-
                     b.Property<int>("Stock")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StockMinimo")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -330,22 +326,6 @@ namespace Zetta.Migrations
                     b.HasIndex("MarcaId");
 
                     b.ToTable("Producto");
-                });
-
-            modelBuilder.Entity("Zetta.Models.Provincia", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Nombre")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Provincia");
                 });
 
             modelBuilder.Entity("Zetta.Models.Stock", b =>
