@@ -1,11 +1,34 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@model Zetta.Models.ViewModels.HomeVM
 
-<div class="text-center">
-    <h1 class="display-4">ZETTA COMPUTACIÓN</h1>
-    <br />
-    <h2>Aquí debería aparecer todo lo público</h2>
-    <br />
-    <img src="~/imagenes/imagen1.png" />
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="btn-group-vertical">
+                <button class="btn btn-dark btn-sm filter-button" data-filter="all">Todos</button>
+                @foreach (var cat in Model.Categorias)
+                {
+                    <button class="btn btn-outline-secondary btn-sm filter-button" data-filter="@cat.Nombre.Replace(' ','_')">@cat.Nombre</button>
+                }
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="row">
+                @foreach (var prod in Model.Productos)
+                {
+                    <div class="col-md-4">
+                        <!-- Agregamos la clase "mb-4" para ajustar el margen inferior -->
+                        <partial name="_ProductoCard" model="prod"></partial>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
 </div>
+
+
+
+
+
+
+
+

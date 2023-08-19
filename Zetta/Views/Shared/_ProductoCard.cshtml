@@ -1,0 +1,52 @@
+﻿@model Zetta.Models.Producto
+
+<div class="col-lg-12 col-md-6 pb-4 filter @Model.Categoria.Nombre.Replace(' ','_')">
+    <!-- Card-->
+    <div class="card bg-white rounded shadow-sm hoverable-card" style="border:1px solid #222">
+        <div class="card-header bg-black text-center">
+            <span class="text-success h5">@Model.Nombre</span>
+        </div>
+        <img class="card-img-top img-fluid d-block mx-auto mb-3" style="height: 200px; object-fit: cover;" src="@WC.ImagenRuta@Model.ImagenUrl" alt="Imagen Card">
+        <div class="card-body p-1 px-3 row">
+            <div class="col-6">
+                <span class="badge p-2 border w-100 text-dark" style="background-color:lavenderblush">@Model.Categoria.Nombre</span>
+            </div>
+            <div class="col-6 border-0">
+                <span class="badge p-2 border w-100 text-dark" style="background-color:aliceblue">@Model.Marca.Nombre</span>
+            </div>
+            <div class="col-12 p-1">
+                <a asp-action="Detalle" asp-route-Id="@Model.Id" class="btn btn-dark form-control btn-sm p-2" style="height:40px">Ver detalles</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hoverable-card {
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+        .hoverable-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+    .card-header {
+        background-color: green;
+        color: black;
+        padding: 10px;
+        height: 84px
+    }
+
+        .card-header span {
+            display: block;
+        }
+
+        /* Ajusta el tamaño de la fuente del nombre del producto */
+        .card-header .h5 {
+            font-size: 16px; /* Ajusta el tamaño según tu preferencia */
+        }
+</style>
+
+
+
