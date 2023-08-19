@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Zetta.Datos;
 
@@ -11,9 +12,10 @@ using Zetta.Datos;
 namespace Zetta.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230815183421_AgregarStockMinimoAProductos")]
+    partial class AgregarStockMinimoAProductos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -243,22 +245,6 @@ namespace Zetta.Migrations
                     b.ToTable("Categoria");
                 });
 
-            modelBuilder.Entity("Zetta.Models.CondIva", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Nombre")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CondIva");
-                });
-
             modelBuilder.Entity("Zetta.Models.Marca", b =>
                 {
                     b.Property<int>("Id")
@@ -283,6 +269,9 @@ namespace Zetta.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<bool>("AlertaStock")
+                        .HasColumnType("bit");
 
                     b.Property<int>("CategoriaId")
                         .HasColumnType("int");
@@ -330,71 +319,6 @@ namespace Zetta.Migrations
                     b.HasIndex("MarcaId");
 
                     b.ToTable("Producto");
-                });
-
-            modelBuilder.Entity("Zetta.Models.Proveedor", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("CondIvaId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Contacto")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Direccion")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Localidad")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProvinciaId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Razonsocial")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Telefono")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Website")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CondIvaId");
-
-                    b.HasIndex("ProvinciaId");
-
-                    b.ToTable("Proveedor");
-                });
-
-            modelBuilder.Entity("Zetta.Models.Provincia", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Nombre")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Provincia");
                 });
 
             modelBuilder.Entity("Zetta.Models.Stock", b =>
@@ -504,25 +428,6 @@ namespace Zetta.Migrations
                     b.Navigation("Categoria");
 
                     b.Navigation("Marca");
-                });
-
-            modelBuilder.Entity("Zetta.Models.Proveedor", b =>
-                {
-                    b.HasOne("Zetta.Models.CondIva", "CondIva")
-                        .WithMany()
-                        .HasForeignKey("CondIvaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Zetta.Models.Provincia", "Provincia")
-                        .WithMany()
-                        .HasForeignKey("ProvinciaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CondIva");
-
-                    b.Navigation("Provincia");
                 });
 
             modelBuilder.Entity("Zetta.Models.Stock", b =>

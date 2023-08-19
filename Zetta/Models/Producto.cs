@@ -43,7 +43,9 @@ namespace Zetta.Models
 
         public int Stock { get; set; }
 
+        public int StockMinimo { get; set; }
 
+        public bool Publicado { get; set; }
 
     }
 }
