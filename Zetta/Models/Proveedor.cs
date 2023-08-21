@@ -40,7 +40,8 @@ namespace Zetta.Models
         public virtual CondIva? CondIva { get; set; }
 
         [Required(ErrorMessage = "El Clave Tributaria es Obligatoria.")]
-        public string? Cuit { get; }
+        [RegularExpression(@"^[0-9]+$", ErrorMessage = "Solo se permiten números sin espacios en blanco.")]
+        public string? Cuit { get; set; }
 
     }
 }

@@ -1,0 +1,107 @@
+﻿@model Zetta.Models.ViewModels.ProveedorVM
+
+@{
+    ViewData["Title"] = "Editar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form method="post" asp-action="Editar">
+    <input asp-for="Proveedor.Id" hidden />
+    <div class="border p-3 ">
+
+        <div asp-validation-summary="ModelOnly" class="text-danger">
+        </div>
+
+        <div class="form-group row">
+            <h2 class="text-info pl-3">Editar Proveedor</h2>
+        </div>
+        <hr />
+
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <label asp-for="Proveedor.Razonsocial" class="form-label">Razón Social</label>
+                    <input asp-for="Proveedor.Razonsocial" class="form-control" />
+                    <span asp-validation-for="Proveedor.Razonsocial" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Proveedor.Direccion" class="form-label">Dirección</label>
+                    <input asp-for="Proveedor.Direccion" class="form-control" />
+                    <span asp-validation-for="Proveedor.Direccion" class="text-danger"></span>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-md-6">
+                    <label asp-for="Proveedor.Localidad" class="form-label">Localidad</label>
+                    <input asp-for="Proveedor.Localidad" class="form-control" />
+                    <span asp-validation-for="Proveedor.Localidad" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Proveedor.ProvinciaId" class="form-label">Provincia</label>
+                    <select asp-for="Proveedor.ProvinciaId" asp-items="@Model.ProvinciaLista" class="form-select">
+                        <option disabled selected>--Seleccione una Provincia</option>
+                    </select>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-md-6">
+                    <label asp-for="Proveedor.Telefono" class="form-label">Teléfono</label>
+                    <input asp-for="Proveedor.Telefono" class="form-control" />
+                    <span asp-validation-for="Proveedor.Telefono" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Proveedor.Email" class="form-label">Email</label>
+                    <input asp-for="Proveedor.Email" class="form-control" />
+                    <span asp-validation-for="Proveedor.Email" class="text-danger"></span>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-md-6">
+                    <label asp-for="Proveedor.Contacto" class="form-label">Contacto</label>
+                    <input asp-for="Proveedor.Contacto" class="form-control" />
+                    <span asp-validation-for="Proveedor.Contacto" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Proveedor.Website" class="form-label">Website</label>
+                    <input asp-for="Proveedor.Website" class="form-control" />
+                    <span asp-validation-for="Proveedor.Website" class="text-danger"></span>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-md-6">
+                    <label asp-for="Proveedor.CondIvaId" class="form-label">C.F.IVA</label>
+                    <select asp-for="Proveedor.CondIvaId" asp-items="@Model.CondIvaLista" class="form-select">
+                        <option disabled selected>--Seleccione una Condición</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Proveedor.Cuit" class="form-label">C.U.I.T.</label>
+                    <input asp-for="Proveedor.Cuit" class="form-control" />
+                    <span asp-validation-for="Proveedor.Cuit" class="text-danger"></span>
+                </div>
+            </div> 
+            <br />
+
+            <div class="row p-1">
+                <div class="col-6 col-md-3">
+                    <button type="submit" class="btn btn-primary form-control">Actualizar</button>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a asp-controller="Proveedor" asp-action="Index" class="btn btn-secondary form-control">Regresar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
+

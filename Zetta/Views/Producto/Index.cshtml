@@ -31,7 +31,6 @@
         </div>
     </div>
 
-
     <form asp-controller="Producto" asp-action="Index">
         <p>
             Buscar: <input type="text" name="buscar" class="form-text" />
@@ -39,8 +38,6 @@
         </p>
     </form>
     <button onclick="goBack()" class="btn btn-primary">Volver</button>
-@*    <a asp-controller="Producto" asp-action="Index" class="btn btn-primary">Volver</a>
-*@
 
     <hr />
     <br />
@@ -60,7 +57,6 @@
                         <a asp-action="Index" asp-route-ordenActual="@ViewData["FiltroNombre"]">
                             <span class="column-header">Nombre</span>
                         </a>
-                        
                     </th>
 
                     <th>
@@ -92,13 +88,7 @@
                         <td class="text-center">@item.Marca.Nombre</td>
                         <td class="text-center">@item.Categoria.Nombre</td>
                         <td class="text-end">@item.Precio.ToString("N2")</td>
-                        <td class="text-center">
-                            @item.Stock
-                           @* @if (@item.AlertaStock && item.Stock < item.StockMinimo)
-                            {
-                                <i class="bi bi-exclamation-circle icono-advertencia"></i>
-                            }*@
-                        </td>
+                        <td class="text-center">@item.Stock</td>
                         <td class="text-center">
                             <div class="w-100 btn-group d-flex justify-content-center" role="group">
                                 <a asp-controller="Producto" asp-action="Upsert" asp-route-Id="@item.Id" class="btn btn-primary mx-2" data-toggle="tooltip" data-placement="top" title="Editar">
@@ -155,37 +145,37 @@
     {
         <p>No hay registros de Productos</p>
     }
-   @* <div id="productosBajoStock" class="mt-4">
-        <h3>Productos con Bajo Stock</h3>
-        <table class="table table-bordered table-striped" style="width:100%">
-            <thead>
-                <tr class="table-dark text-center">
-                    <th>
-                        Codigo
-                    </th>
-                    <th>
-                        Producto
-                    </th>
-                    <th>
-                        Stock Mínimo
-                    </th>
-                    <th>
-                        Stock Actual
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Where(p => p.Stock < p.StockMinimo))
-                {
-                    <tr>
-                        <td>@item.Codigo</td>
-                        <td>@item.Nombre</td>
-                        <td>@item.StockMinimo</td>
-                        <td>@item.Stock</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+    @* <div id="productosBajoStock" class="mt-4">
+    <h3>Productos con Bajo Stock</h3>
+    <table class="table table-bordered table-striped" style="width:100%">
+    <thead>
+    <tr class="table-dark text-center">
+    <th>
+    Codigo
+    </th>
+    <th>
+    Producto
+    </th>
+    <th>
+    Stock Mínimo
+    </th>
+    <th>
+    Stock Actual
+    </th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.Where(p => p.Stock < p.StockMinimo))
+    {
+    <tr>
+    <td>@item.Codigo</td>
+    <td>@item.Nombre</td>
+    <td>@item.StockMinimo</td>
+    <td>@item.Stock</td>
+    </tr>
+    }
+    </tbody>
+    </table>
     </div>*@
     <div class="modal" id="lowStockModal" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-xl" role="document">
@@ -234,11 +224,11 @@
         window.history.back();
     }
 
-    //$(document).ready(function () {
-    //    $('#openLowStockModal').click(function () {
-    //        $('#lowStockModal').modal('show');
-    //    });
-    //});
+        //$(document).ready(function () {
+        //    $('#openLowStockModal').click(function () {
+        //        $('#lowStockModal').modal('show');
+        //    });
+        //});
 </script>
 
 <style>
