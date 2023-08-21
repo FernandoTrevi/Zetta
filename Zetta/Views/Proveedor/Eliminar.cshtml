@@ -1,0 +1,50 @@
+﻿@model Zetta.Models.Proveedor
+
+@{
+    ViewData["Title"] = "Eliminar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="border p-3 main-container">
+    <div class="form-group row">
+        <h2 class="text-danger pl-3">Eliminar Proveedor</h2>
+    </div>
+    <hr />
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <label asp-for="Razonsocial" class="form-label">Razón Social</label>
+                <input asp-for="Razonsocial" class="form-control" disabled />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Contacto" class="form-label">Contacto</label>
+                <input asp-for="Contacto" class="form-control" disabled />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <label asp-for="Direccion" class="form-label">Dirección</label>
+                <input asp-for="Direccion" class="form-control" disabled />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Localidad" class="form-label">Localidad</label>
+                <input asp-for="Localidad" class="form-control" disabled />
+            </div>
+           
+            <!-- Agregar aquí más campos del proveedor si es necesario -->
+            <br />
+
+            <form asp-action="ConfirmarEliminar" method="post">
+                <input asp-for="Id" hidden />
+                <div class="row p-1">
+                    <div class="col-6 col-md-3">
+                        <button type="submit" class="btn btn-danger form-control">Confirmar Eliminar</button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a asp-controller="Proveedor" asp-action="Index" class="btn btn-secondary form-control">Cancelar</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>

@@ -67,45 +67,6 @@ namespace Zetta.Controllers
             return View(paginacion);
         }
 
-
-
-
-        //public async Task<IActionResult> Index(string buscar, int? numpag, string filtroActual)
-        //{
-        //    IEnumerable<Producto> lista = _db.Producto.Include(m => m.Marca)
-        //                                              .Include(c => c.Categoria);
-
-        //    if (buscar != null)
-        //        numpag = 1;
-        //    else
-        //        buscar = filtroActual;
-
-        //    ViewData["FiltroActual"] = buscar;
-
-        //    if (!String.IsNullOrEmpty(buscar))
-        //    {
-        //        lista = lista.Where(p => p.Nombre.Contains(buscar) || p.Codigo.Contains(buscar));
-        //    }
-
-
-        //    lista = lista.OrderBy(p => p.Nombre);
-        //    int cantidadregistros = 5;
-        //    return View(await Paginacion<Producto>.CrearPaginacion(lista.AsQueryable(), numpag ?? 1, cantidadregistros));
-        //    // return View(await Paginacion<Producto>.CrearPaginacion(lista, numpag ?? 1, cantidadregistros));
-        //}
-
-        // Get Producto ORIGINAL
-        //public IActionResult Index(string buscar)
-        //{
-        //    IEnumerable<Producto> lista = _db.Producto.Include(m => m.Marca)
-        //                                              .Include(c => c.Categoria);
-
-        //    if (!String.IsNullOrEmpty(buscar))
-        //    {
-        //        lista = lista.Where(p => p.Nombre!.Contains(buscar) || p.Codigo.Contains(buscar));
-        //    }
-        //    return View(lista);
-        //}
         public IActionResult Upsert(int? Id)
         {
             ProductoVM productoVM = new ProductoVM()
@@ -121,11 +82,7 @@ namespace Zetta.Controllers
                     Text = c.Nombre,
                     Value = c.Id.ToString()
                 })
-                
-                
             };
-
-
 
             if (Id == null)
             {
@@ -142,7 +99,6 @@ namespace Zetta.Controllers
                 return View(productoVM);
             }
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]

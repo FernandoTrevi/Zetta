@@ -1,8 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Zetta.Datos
 {
@@ -28,12 +24,5 @@ namespace Zetta.Datos
             var items = await fuente.Skip((paginaInicio - 1) * cantidadregistros).Take(cantidadregistros).ToListAsync();
             return new Paginacion<T>(items, contador, paginaInicio, cantidadregistros);
         }
-
-        //public static async Task<Paginacion<T>> CrearPaginacion(IQueryable<T> fuente, int paginaInicio, int cantidadregistros)
-        //{
-        //    var contador = await fuente.CountAsync();
-        //    var items = await fuente.Skip((paginaInicio - 1) * cantidadregistros).Take(cantidadregistros).ToListAsync();
-        //    return new Paginacion<T>(items, contador, paginaInicio, cantidadregistros);
-        //}
     }
 }

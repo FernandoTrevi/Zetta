@@ -14,7 +14,9 @@ namespace Zetta.Models
         public virtual Producto Producto { get; set; }
 
         public int Cantidad { get; set; }
+
         public DateTime Fecha { get; set; }
+
         public string Concepto { get; set; }
     }
 }
