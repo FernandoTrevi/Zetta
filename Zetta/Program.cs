@@ -23,6 +23,24 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                             options.UseSqlServer(
                                 builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Configurar el servicio HttpContextAccessor que permite acceder a información sobre la solicitud web actual
+builder.Services.AddHttpContextAccessor();
+
+// Configurar el servicio de sesiones
+builder.Services.AddSession(options =>
+{
+    // Establecer el tiempo de espera de inactividad de la sesión en 10 minutos
+    options.IdleTimeout = TimeSpan.FromMinutes(10);
+
+    // Configurar la cookie de sesión para que sea de solo lectura a través de HTTP
+    options.Cookie.HttpOnly = true;
+
+    // Marcar la cookie de sesión como esencial, para que se envíe incluso si las cookies están desactivadas en el navegador del usuario
+    options.Cookie.IsEssential = true;
+});
+
+
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddDefaultTokenProviders().AddDefaultUI()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -83,15 +101,12 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseSession();
+
 app.MapRazorPages();
 
 
-/*
- *  Esta extensi?n se utiliza para definir las rutas de controlador en una aplicaci?n web ASP.NET Core MVC. Define c?mo
- *  se deben asignar las solicitudes HTTP a los m?todos del controlador correspondiente. En la l?nea de c?digo proporcionada,
- *  la ruta predeterminada se define como "{controller=Home}/{action=Index}/{id?}", lo que significa que si la ruta no se 
- *  especifica, la solicitud se enviar? al controlador "Home" y se llamar? al m?todo "Index" con un par?metro opcional "id".
- */
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

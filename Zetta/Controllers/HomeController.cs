@@ -27,6 +27,17 @@ namespace Zetta.Controllers
             return View(homeVM);
         }
 
+        public IActionResult Detalle(int Id) 
+        {
+            DetalleVM detalleVM = new DetalleVM
+            {
+                Producto = _db.Producto.Include(m => m.Marca).Include(c => c.Categoria)
+                .Where(p=>p.Id == Id).FirstOrDefault(),
+                ExisteEnCarro = false
+            };
+            return View(detalleVM);
+        }
+
         public IActionResult Privacy()
         {
             return View();
