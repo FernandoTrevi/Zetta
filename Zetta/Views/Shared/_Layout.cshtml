@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@using Zetta.Utilidades
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -74,6 +78,24 @@
 
                             </ul>
 
+                        </li>
+                        <li>
+                            @if (HttpContextAccessor.HttpContext.Session.Get<List<CarroCompra>>(WC.SessionCarroCompras) != null)
+                            {
+                                <a asp-action="Index" asp-controller="Carro" class="nav-link">
+                                    @{
+                                        var count = HttpContextAccessor.HttpContext.Session.Get<List<CarroCompra>>(WC.SessionCarroCompras).Count();
+                                    }
+                                    <i class="fas fa-shopping-cart"></i>&nbsp;(@count)
+                                </a>
+                            }
+                            else
+                            {
+                                <a href="#" class="nav-link">
+                                    <i class="fas fa-shopping-cart"></i>&nbsp;(0)
+
+                                </a>
+                            }
                         </li>
                         <li>
                             <a class="nav-link text-light" asp-area="Identity" asp-page="/account/register">Crear Usuario Administrador</a>
