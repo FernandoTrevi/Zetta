@@ -8,6 +8,6 @@ namespace Zetta.Models
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Nombre de Categoria es Obligatorio.")]
-        public string? Nombre { get; set; }
+        public string Nombre { get; set; }
     }
 }

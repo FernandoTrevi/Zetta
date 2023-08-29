@@ -19,5 +19,7 @@ namespace Zetta.Datos
         public DbSet<CondIva> CondIva { get; set; }
         public DbSet<Provincia> Provincia { get; set; }
         public DbSet<Proveedor> Proveedor { get; set; }
+        public DbSet<OrdenCompra> OrdenCompra { get; set; }
+
     }
 }

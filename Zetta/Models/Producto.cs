@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-
 namespace Zetta.Models
 {
     public class Producto
@@ -19,18 +18,18 @@ namespace Zetta.Models
         public int MarcaId { get; set; }
 
         [ForeignKey("MarcaId")]
-        public virtual Marca? Marca { get; set; }
+        public virtual Marca Marca { get; set; }
 
         [Required(ErrorMessage = "La Categoría de Producto es Obligatorio.")]
         public int CategoriaId { get; set; }
 
         [ForeignKey("CategoriaId")]
-        public virtual Categoria? Categoria { get; set; }
+        public virtual Categoria Categoria { get; set; }
 
         [Required(ErrorMessage = "La Descripción de Producto es Obligatorio.")]
         public string Descripcion { get; set; }
 
-        public string? ImagenUrl { get; set; }
+        public string ImagenUrl { get; set; }
 
         [Required(ErrorMessage = "El Costo de Producto es Obligatorio.")]
         //[Range(1, double.MaxValue, ErrorMessage = "El Costo debe ser Mayor a Cero")]
