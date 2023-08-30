@@ -20,6 +20,7 @@ namespace Zetta.Datos
         public DbSet<Provincia> Provincia { get; set; }
         public DbSet<Proveedor> Proveedor { get; set; }
         public DbSet<OrdenCompra> OrdenCompra { get; set; }
+        public DbSet<OrdenCompraDetalle> OrdenCompraDetalle { get; set; }
 
     }
 }
