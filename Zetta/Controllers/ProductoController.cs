@@ -9,9 +9,13 @@ using System.Threading.Tasks;
 using OfficeOpenXml.Table;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace Zetta.Controllers
 {
+    [Authorize(Roles = WC.AdminRole)]
+
     public class ProductoController : Controller
     {
         private readonly ApplicationDbContext _db;

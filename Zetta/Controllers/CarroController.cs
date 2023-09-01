@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Text;
 using Zetta.Datos;
 using Zetta.Models;
 using Zetta.Models.ViewModels;
@@ -15,9 +17,13 @@ namespace Zetta.Controllers
         [BindProperty]
         public ProductoUsuarioVM productoUsuarioVM { get; set; }
         private readonly ApplicationDbContext _db;
-        public CarroController(ApplicationDbContext db)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IEmailSender _emailSender;
+        public CarroController(ApplicationDbContext db, IWebHostEnvironment webHostEnvironment, IEmailSender emailSender)
         {
             _db = db;
+            _webHostEnvironment = webHostEnvironment;
+            _emailSender = emailSender;
         }
         public IActionResult Index()
         {
@@ -63,13 +69,56 @@ namespace Zetta.Controllers
             productoUsuarioVM = new ProductoUsuarioVM()
             {
                 UsuarioAplicacion = _db.UsuarioAplicacion.FirstOrDefault(u => u.Id == claims.Value),
-                ProductoLista = productoList,
+                ProductoLista = productoList.ToList(),
 
             };
             //
 
             //Retorna el ViewModels a la vista Resúmen
             return View(productoUsuarioVM); 
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName("Resumen")]
+        public async Task<IActionResult> ResumenPost(ProductoUsuarioVM productoUsuarioVM)
+        {
+            var templatePath = _webHostEnvironment.WebRootPath + Path.DirectorySeparatorChar.ToString()
+                                                               + "templates"
+                                                               + Path.DirectorySeparatorChar.ToString()
+                                                               + "PlantillaOrden.html";
+            var subjet = "Nueva orden";
+            var htmlBody = "";
+
+            using (StreamReader sr = System.IO.File.OpenText(templatePath))
+            {
+                htmlBody = sr.ReadToEnd();
+            }
+
+            StringBuilder productoListaSb = new StringBuilder();
+
+            foreach(var prod in productoUsuarioVM.ProductoLista)
+            {
+                productoListaSb.Append($" - Nombre: {prod.Nombre} <span style=´font-size:14px;´>(Id: {prod.Id})<span/><br/>");
+            }
+
+            string msgBody = string.Format(htmlBody,
+                                           productoUsuarioVM.UsuarioAplicacion.NombreCompleto,
+                                           productoUsuarioVM.UsuarioAplicacion.Email,
+                                           productoUsuarioVM.UsuarioAplicacion.PhoneNumber,
+                                           productoListaSb.ToString());
+
+            await _emailSender.SendEmailAsync(WC.EmailAdmin,subjet,msgBody);
+                
+
+
+            return RedirectToAction(nameof(Confirmacion));
+        }
+
+        public IActionResult Confirmacion()
+        {
+            HttpContext.Session.Clear();
+            return View();
         }
 
         public IActionResult Remover(int Id)
