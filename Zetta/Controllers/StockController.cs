@@ -3,9 +3,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Zetta.Datos;
 using Zetta.Models.ViewModels;
 using Zetta.Models;
+using Microsoft.AspNetCore.Authorization;
+using Zetta;
 
 namespace Zetta1.Controllers
 {
+    [Authorize (Roles = WC.AdminRole)]
     public class StockController : Controller
     {
         private readonly ApplicationDbContext _context;

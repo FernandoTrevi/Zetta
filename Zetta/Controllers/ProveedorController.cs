@@ -1,12 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using Zetta.Datos;
 using Zetta.Models;
 using Zetta.Models.ViewModels;
 
 namespace Zetta.Controllers
 {
+    [Authorize(Roles = WC.AdminRole)]
+
     public class ProveedorController : Controller
     {
         private readonly ApplicationDbContext _db;

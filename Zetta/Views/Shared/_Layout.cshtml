@@ -39,47 +39,55 @@
                             <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
 
-                        <li class="nav-item dropdown">
-                            <a class="nav-link text-light dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Stock
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li>
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Producto" asp-action="Index">Productos</a>
-                                </li>
-                                <li>
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Marca" asp-action="Index">Marcas</a>
-                                </li>
-                                <li>
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Categoria" asp-action="Index">Categorias</a>
-                                </li>
-                                <li>
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Stock" asp-action="Index">Actualizar Stock</a>
-                                </li>
-                                
-                                @* <li><hr class="dropdown-divider"></li>*@
+                        @if (User.IsInRole(WC.AdminRole))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link text-light dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Stock
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <li>
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Producto" asp-action="Index">Productos</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Marca" asp-action="Index">Marcas</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Categoria" asp-action="Index">Categorias</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Stock" asp-action="Index">Actualizar Stock</a>
+                                    </li>
 
-                            </ul>
+                                    @* <li><hr class="dropdown-divider"></li>*@
 
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link text-light dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Compras
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li>
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Proveedor" asp-action="Index">Proveedores</a>
-                                </li>
-                                <li>
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="OrdenesCompra" asp-action="Index">Órdenes de Compra</a>
-                                </li>
-                                <li>
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="RegistroCompras" asp-action="Index">Registro de compras</a>
-                                </li>
+                                </ul>
 
-                            </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link text-light dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Compras
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <li>
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Proveedor" asp-action="Index">Proveedores</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="OrdenesCompra" asp-action="Index">Órdenes de Compra</a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="RegistroCompras" asp-action="Index">Registro de compras</a>
+                                    </li>
 
-                        </li>
+                                </ul>
+
+                            </li>
+                            <li>
+                                <a class="nav-link text-light" asp-area="Identity" asp-page="/account/register">Crear Usuario Administrador</a>
+                            </li>
+                        }
+                        
+                        
                         <li>
                             @if (HttpContextAccessor.HttpContext.Session.Get<List<CarroCompra>>(WC.SessionCarroCompras) != null)
                             {
@@ -98,9 +106,7 @@
                                 </a>
                             }
                         </li>
-                        <li>
-                            <a class="nav-link text-light" asp-area="Identity" asp-page="/account/register">Crear Usuario Administrador</a>
-                        </li>
+                        
                     </ul>
                     @*<form class="d-flex">
                     <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">

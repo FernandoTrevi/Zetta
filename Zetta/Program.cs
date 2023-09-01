@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using Zetta.Datos;
+using Zetta.Utilidades;
 
 /*
  * Este m?todo inicializa una nueva instancia de la WebApplicationBuilder clase con valores predeterminados preconfigurados.
@@ -44,6 +46,8 @@ builder.Services.AddSession(options =>
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddDefaultTokenProviders().AddDefaultUI()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 var app = builder.Build();
 
