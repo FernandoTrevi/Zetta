@@ -1,0 +1,23 @@
+﻿@model Zetta.Models.OrdenCompra
+
+<h2>Eliminar Orden de Compra</h2>
+
+<div>
+    <h4>¿Estás seguro de que deseas eliminar esta orden de compra?</h4>
+    <dl class="row">
+        <dt class="col-sm-2">
+            Nro Orden:
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.NroOrden)
+        </dd>
+
+        <!-- Agrega aquí los campos de Proveedor, Observaciones, Estado y otros si es necesario -->
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
