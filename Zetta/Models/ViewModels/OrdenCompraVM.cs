@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace Zetta.Models.ViewModels
 {
@@ -12,6 +13,7 @@ namespace Zetta.Models.ViewModels
         public DateTime FechaActual { get; set; }
         public string ProductoCodigo { get; set; } // Código del producto seleccionado
         public string ProductoNombre { get; set; } // Nombre del producto seleccionado
-        public int ProductoCantidad { get; set; }
+        public int? ProductoCantidad { get; set; } // Cambiado a int? (nullable)
+
     }
 }
