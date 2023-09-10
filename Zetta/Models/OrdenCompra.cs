@@ -22,6 +22,9 @@ namespace Zetta.Models
 
         [Required(ErrorMessage = "El Estado es obligatorio.")]
         public EstadoOrden Estado { get; set; }
+
+        public virtual List<OrdenCompraDetalle> OrdenCompraDetalle { get; set; }
+
     }
 
     public enum EstadoOrden

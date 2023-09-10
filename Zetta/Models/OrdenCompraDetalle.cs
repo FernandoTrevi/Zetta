@@ -20,6 +20,7 @@ namespace Zetta.Models
         [ForeignKey("ProductoId")]
         public Producto Producto { get; set; }
 
+        [Required]
         public int Cantidad { get; set; }
 
     }

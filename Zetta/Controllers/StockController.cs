@@ -18,7 +18,7 @@ namespace Zetta1.Controllers
             _context = context;
         }
         // GET: Stock
-        public IActionResult Index(string? ProductoNombre)
+        public IActionResult Index(string ProductoNombre)
         {
             var stockVM = new StockVM();
 

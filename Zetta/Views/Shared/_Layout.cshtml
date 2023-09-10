@@ -63,6 +63,7 @@
 
                                 </ul>
 
+
                             </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link text-light dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -87,7 +88,6 @@
                             </li>
                         }
                         
-                        
                         <li>
                             @if (HttpContextAccessor.HttpContext.Session.Get<List<CarroCompra>>(WC.SessionCarroCompras) != null)
                             {
@@ -106,7 +106,7 @@
                                 </a>
                             }
                         </li>
-                        
+
                     </ul>
                     @*<form class="d-flex">
                     <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
@@ -116,7 +116,8 @@
             </div>
         </nav>
     </header>
-    <div class="container" style="margin-top: 70px;">        <!-- Agrega margen superior para evitar que el contenido quede oculto detrás de la barra de navegación -->
+    <div class="container" style="margin-top: 70px;">
+        <!-- Agrega margen superior para evitar que el contenido quede oculto detrás de la barra de navegación -->
         <main role="main" class="pb-3">
             <partial name="_Notificacion" />
             @RenderBody()
@@ -139,4 +140,3 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-

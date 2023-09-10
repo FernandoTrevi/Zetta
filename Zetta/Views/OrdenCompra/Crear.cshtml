@@ -1,0 +1,220 @@
+﻿@model Zetta.Models.ViewModels.OrdenCompraVM
+
+@{
+    ViewData["Title"] = "Crear Orden de Compra";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container p-3">
+    <h2 class="text-info">Crear Orden de Compra</h2>
+    <hr />
+    <br />
+
+    <form asp-controller="OrdenCompra" asp-action="Crear" method="post">
+        <div class="row">
+            <div class="col-md-6">
+                <label asp-for="OrdenCompra.NroOrden" class="form-label">Nro de Orden</label>
+                <input asp-for="OrdenCompra.NroOrden" class="form-control" />
+                <span asp-validation-for="OrdenCompra.NroOrden" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="FechaActual" class="form-label">Fecha</label>
+                <input type="date" class="form-control" asp-for="FechaActual" value="@Model.FechaActual.ToString("yyyy-MM-dd")" />
+            </div>
+        </div>
+        <br />
+
+        <div class="row">
+            <div class="col-md-6">
+                <label asp-for="OrdenCompra.ProveedorId" class="form-label">Proveedor</label>
+                <select asp-for="OrdenCompra.ProveedorId" asp-items="@Model.ProveedorLista" class="form-select">
+                    <option disabled selected>--Seleccione un Proveedor</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="OrdenCompra.Observaciones" class="form-label">Observaciones</label>
+                <input asp-for="OrdenCompra.Observaciones" class="form-control" />
+                <span asp-validation-for="OrdenCompra.Observaciones" class="text-danger"></span>
+            </div>
+        </div>
+        <br />
+
+        <h3 class="text-primary">Detalles de Compra</h3>
+        <hr />
+        <br />
+
+        <div class="row">
+            <div class="col-md-3">
+                <label asp-for="ProductoCodigo" class="form-label">Código</label>
+                <select asp-for="ProductoCodigo" asp-items="@Model.ProductoCodigoLista" class="form-select">
+                    <option disabled selected>--Seleccione un Código</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="ProductoNombre" class="form-label">Nombre</label>
+                <select asp-for="ProductoNombre" asp-items="@Model.ProductoNombreLista" class="form-select">
+                    <option disabled selected>--Seleccione un Nombre</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="ProductoCantidad" class="form-label">Cantidad</label>
+                <input asp-for="ProductoCantidad" class="form-control" />
+                <span asp-validation-for="ProductoCantidad" class="text-danger"></span>
+            </div>
+        </div>
+        <br />
+
+        <table id="tablaDetalle" class="table table-bordered table-striped table-hover">
+            <!-- Encabezado de la tabla -->
+            <thead>
+                <tr class="table-dark text-center">
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Cantidad</th>
+                </tr>
+            </thead>
+
+            <!-- Cuerpo de la tabla donde se agregarán filas dinámicamente -->
+            <tbody>
+            </tbody>
+        </table>
+        <br />
+
+        <!-- Campo oculto para almacenar los detalles de la orden de compra en formato JSON -->
+        <input type="hidden" id="detalleJson" name="detalleJson" />
+
+        <div class="row">
+            <div class="col-md-3">
+                <button type="button" id="agregarProducto" class="btn btn-info form-control">Agregar Producto</button>
+            </div>
+
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary form-control">Confirmar Orden</button>
+            </div>
+
+           @*  <div class="col-md-3">
+                <button type="button" id="confirmarOrden" class="btn btn-primary form-control">Confirmar Orden</button>
+            </div> *@
+
+            <div class="col-md-3">
+                <a asp-controller="OrdenCompra" asp-action="Index" class="btn btn-secondary form-control">Regresar</a>
+            </div>
+        </div>
+        <br />
+    </form>
+</div>
+
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+    <script>
+        var ordenCompraVM = {}; // Declaración del objeto ViewModel
+        // Función para agregar una fila a la tabla de detalles
+        function agregarFila() {
+            var codigo = $("#ProductoCodigo").val(); // Obtén el código del producto desde un campo de entrada
+            var nombre = $("#ProductoNombre").val(); // Obtén el nombre del producto desde un campo de entrada
+            var cantidad = $("#ProductoCantidad").val(); // Obtén la cantidad desde un campo de entrada
+
+            // Verifica que haya un código y una cantidad válidos antes de agregar la fila
+            if (codigo && nombre && cantidad && !isNaN(cantidad) && cantidad > 0) {
+                ordenCompraVM.ProductoCodigo = codigo; // Actualiza el código en el ViewModel
+                ordenCompraVM.ProductoNombre = nombre; // Actualiza el nombre en el ViewModel
+                ordenCompraVM.ProductoCantidad = cantidad; // Actualiza la cantidad en el ViewModel
+                // Crea una nueva fila HTML
+                var fila = "<tr>" +
+                    "<td>" + codigo + "</td>" +
+                    "<td>" + nombre + "</td>" +
+                    "<td>" + cantidad + "</td>" +
+                    "</tr>";
+
+                // Agrega la fila a la tabla de detalles
+                $("#tablaDetalle tbody").append(fila);
+
+                // Limpia los campos de entrada después de agregar la fila
+                $("#ProductoCodigo").val("");
+                $("#ProductoNombre").val("");
+                $("#ProductoCantidad").val("");
+            } else {
+                // Muestra un mensaje de error o realiza alguna acción para manejar datos inválidos
+                alert("Por favor, ingrese un código válido, un nombre válido y una cantidad válida mayor a cero.");
+            }
+        }
+
+        // Manejador de clic en el botón "Agregar Producto"
+        $("#agregarProducto").click(function () {
+            agregarFila();
+        });
+    </script>
+
+    <script>
+        // Convierte las listas de códigos y nombres en arrays de JavaScript
+        var productoCodigoLista = @Html.Raw(Json.Serialize(Model.ProductoCodigoLista.Select(x => x.Value).ToList()));
+        var productoNombreLista = @Html.Raw(Json.Serialize(Model.ProductoNombreLista.Select(x => x.Value).ToList()));
+
+        var ultimoCodigoSeleccionado = ""; // Variable para rastrear el último código seleccionado
+        var ultimoNombreSeleccionado = ""; // Variable para rastrear el último nombre seleccionado
+
+        // Agregar un evento de cambio para el campo ProductoNombre
+        $("#ProductoCodigo, #ProductoNombre").on("input change", function () {
+            var codigoSeleccionado = $("#ProductoCodigo").val();
+            var nombreSeleccionado = $("#ProductoNombre").val();
+
+            if (codigoSeleccionado !== ultimoCodigoSeleccionado) {
+                // Si se cambió el código, autocompletar el campo nombre
+                var indiceCodigo = productoCodigoLista.indexOf(codigoSeleccionado);
+                if (indiceCodigo !== -1) {
+                    var nombreCorrespondiente = productoNombreLista[indiceCodigo];
+                    $("#ProductoNombre").val(nombreCorrespondiente);
+                }
+                ultimoCodigoSeleccionado = codigoSeleccionado;
+            } else if (nombreSeleccionado !== ultimoNombreSeleccionado) {
+                // Si se cambió el nombre, autocompletar el campo código
+                var indiceNombre = productoNombreLista.indexOf(nombreSeleccionado);
+                if (indiceNombre !== -1) {
+                    var codigoCorrespondiente = productoCodigoLista[indiceNombre];
+                    $("#ProductoCodigo").val(codigoCorrespondiente);
+                }
+                ultimoNombreSeleccionado = nombreSeleccionado;
+            }
+        });
+
+    </script>
+
+   @*  <script>
+        // Manejador de clic en el botón "Confirmar Orden"
+        $("#confirmarOrden").click(function () {
+            // Verifica si hay al menos un detalle de compra en la tabla
+            if ($("#tablaDetalle tbody tr").length > 0) {
+                // Crea un array para almacenar los detalles de compra
+                var detalles = [];
+
+                // Itera a través de las filas de la tabla
+                $("#tablaDetalle tbody tr").each(function () {
+                    var codigo = $(this).find("td:eq(0)").text();
+                    var nombre = $(this).find("td:eq(1)").text();
+                    var cantidad = parseInt($(this).find("td:eq(2)").text());
+
+                    // Crea un objeto de detalle de compra y agrégalo al array
+                    var detalle = {
+                        ProductoCodigo: codigo,
+                        ProductoNombre: nombre,
+                        ProductoCantidad: cantidad
+                    };
+                    detalles.push(detalle);
+                });
+
+                // Agrega el array de detalles al campo oculto en formato JSON
+                $("#detalleJson").val(JSON.stringify(detalles));
+
+                // Envía el formulario para almacenar los datos en el servidor
+                $("form").submit();
+            } else {
+                alert("Agregue al menos un detalle de compra antes de confirmar la orden.");
+            }
+        });
+    </script> *@
+
+}
