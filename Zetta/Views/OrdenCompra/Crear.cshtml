@@ -112,53 +112,81 @@
         <partial name="_ValidationScriptsPartial" />
     }
     <script>
-        var num =0;
-        function AgregarDetalle(){
+        var num = 0;
+        var detalles = []; // Array para almacenar los detalles
+
+        function AgregarDetalle() {
             let Codigo = document.getElementById("ProductoCodigo").value;
             let Nombre = document.getElementById("ProductoNombre").value;
             let Cantidad = document.getElementById("ProductoCantidad").value;
 
-            let Tabla = document.getElementById("tablaDetalle");
-            let TR = document.createElement("tr");
-            let TDCodigo = document.createElement("td");
-            let TDNombre = document.createElement("td");
-            let TDCantidad = document.createElement("td");
-            TR.appendChild(TDCodigo);
-            TR.appendChild(TDNombre);
-            TR.appendChild(TDCantidad);
-            Tabla.appendChild(TR);
-            TDCodigo.innerHTML = Codigo;
-            TDNombre.innerHTML = Nombre;
-            TDCantidad.innerHTML = Cantidad;
+            if (Codigo && Nombre && Cantidad && !isNaN(Cantidad) && Cantidad > 0) {
+                // Verificar si el producto ya existe en la lista de detalles
+                var existeProducto = detalles.some(function (detalle) {
+                    return detalle.Codigo === Codigo && detalle.Nombre === Nombre;
+                });
 
-            let DivDetalle = document.getElementById("detalles");
-            let HiddenCodigo = document.createElement("input");
-            let HiddenNombre = document.createElement("input");
-            let HiddenCantidad = document.createElement("input");
-           
+                if (!existeProducto) {
+                    let Tabla = document.getElementById("tablaDetalle");
+                    let TR = document.createElement("tr");
+                    let TDCodigo = document.createElement("td");
+                    let TDNombre = document.createElement("td");
+                    let TDCantidad = document.createElement("td");
 
-            HiddenCodigo.name = "OrdenCompraDetalle[" + num + "].Codigo";
-            HiddenCodigo.value = Codigo;
-            HiddenCodigo.type = "hidden";
+                    TR.appendChild(TDCodigo);
+                    TR.appendChild(TDNombre);
+                    TR.appendChild(TDCantidad);
+                    Tabla.appendChild(TR);
+                    TDCodigo.innerHTML = Codigo;
+                    TDNombre.innerHTML = Nombre;
+                    TDCantidad.innerHTML = Cantidad;
 
-            HiddenNombre.name = "OrdenCompraDetalle[" + num + "].Nombre";
-            HiddenNombre.value = Nombre;
-            HiddenNombre.type = "hidden";
+                    let DivDetalle = document.getElementById("detalles");
+                    let HiddenCodigo = document.createElement("input");
+                    let HiddenNombre = document.createElement("input");
+                    let HiddenCantidad = document.createElement("input");
 
-            HiddenCantidad.name = "OrdenCompraDetalle[" + num + "].Cantidad";
-            HiddenCantidad.value = Cantidad;
-            HiddenCantidad.type = "hidden";
+                    HiddenCodigo.name = "OrdenCompraDetalle[" + num + "].Codigo";
+                    HiddenCodigo.value = Codigo;
+                    HiddenCodigo.type = "hidden";
 
-            DivDetalle.appendChild(HiddenCodigo);
-            DivDetalle.appendChild(HiddenNombre);
-            DivDetalle.appendChild(HiddenCantidad);
+                    HiddenNombre.name = "OrdenCompraDetalle[" + num + "].Nombre";
+                    HiddenNombre.value = Nombre;
+                    HiddenNombre.type = "hidden";
 
-            document.getElementById("ProductoCodigo").value = "";
-            document.getElementById("ProductoNombre").value = "";
-            document.getElementById("ProductoCantidad").value = "";
+                    HiddenCantidad.name = "OrdenCompraDetalle[" + num + "].Cantidad";
+                    HiddenCantidad.value = Cantidad;
+                    HiddenCantidad.type = "hidden";
 
-            num ++;
+                    DivDetalle.appendChild(HiddenCodigo);
+                    DivDetalle.appendChild(HiddenNombre);
+                    DivDetalle.appendChild(HiddenCantidad);
+
+                    // Agregar el detalle al array
+                    detalles.push({
+                        Codigo: Codigo,
+                        Nombre: Nombre
+                    });
+
+                    document.getElementById("ProductoCodigo").value = "";
+                    document.getElementById("ProductoNombre").value = "";
+                    document.getElementById("ProductoCantidad").value = "";
+
+                    num++;
+                } else {
+                    // Mostrar un mensaje de error si el producto ya existe
+                    alert("El producto ya está en la lista de detalles.");
+                    document.getElementById("ProductoCodigo").value = "";
+                    document.getElementById("ProductoNombre").value = "";
+                    document.getElementById("ProductoCantidad").value = "";
+                }
+            } else {
+                // Mostrar un mensaje de error si los datos son inválidos
+                alert("Por favor, ingrese un código válido, un nombre válido y una cantidad válida mayor a cero.");
+               
+            }
         }
+
         
     </script>
 
@@ -197,28 +225,5 @@
 
     </script>
 
-   
+  } 
 
-}                    var codigo = $(this).find("td:eq(0)").text();
-                    var nombre = $(this).find("td:eq(1)").text();
-                    var cantidad = parseInt($(this).find("td:eq(2)").text());
-
-                    // Crea un objeto de detalle de compra y agrégalo al array
-                    var detalle = {
-                        ProductoCodigo: codigo,
-                        ProductoNombre: nombre,
-                        ProductoCantidad: cantidad
-                    };
-                    detalles.push(detalle);
-                });
-
-                // Agrega el array de detalles al campo oculto en formato JSON
-                $("#detalleJson").val(JSON.stringify(detalles));
-
-                // Envía el formulario para almacenar los datos en el servidor
-                $("form").submit();
-            } else {
-                alert("Agregue al menos un detalle de compra antes de confirmar la orden.");
-            }
-        });
-    </script> 

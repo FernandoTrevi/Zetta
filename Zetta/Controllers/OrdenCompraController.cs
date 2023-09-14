@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Zetta.Datos;
@@ -34,12 +35,14 @@ public class OrdenCompraController : Controller
 
         var ordenCompraVM = new OrdenCompraVM
         {
+
             ProveedorLista = _context.Proveedor
                 .Select(p => new SelectListItem
                 {
                     Value = p.Id.ToString(),
                     Text = p.Razonsocial
                 }),
+           
             ProductoCodigoLista = _context.Producto
                 .Select(p => new SelectListItem
                 {
@@ -62,53 +65,70 @@ public class OrdenCompraController : Controller
         return View(ordenCompraVM);
     }
 
-    // POST: OrdenCompra/Crear
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Crear(OrdenCompraVM ordenCompraVM)
     {
         if (ModelState.IsValid)
         {
-
-
-            // 1.Crear una nueva orden de compra
-            var ordenCompra = new OrdenCompra
+            try
             {
-                NroOrden = ordenCompraVM.OrdenCompra.NroOrden,
-                Fecha = ordenCompraVM.FechaActual,
-                ProveedorId = ordenCompraVM.OrdenCompra.ProveedorId,
-                Observaciones = ordenCompraVM.OrdenCompra.Observaciones,
-                Estado = ordenCompraVM.OrdenCompra.Estado
-            };
-
-            // 2.Agregar la orden de compra al contexto
-            _context.Add(ordenCompra);
-
-            // Vuelve a inicializar la lista Detalles antes de agregar elementos
-            ordenCompraVM.OrdenCompraDetalle = new List<OrdenCompraDetalle>();
-
-            // 3.Agregar detalles de la orden de compra
-            foreach (OrdenCompraDetalle detalle in ordenCompraVM.OrdenCompraDetalle)
-            {
-                var ordenCompraDetalle = new OrdenCompraDetalle
+                // 1. Crear una nueva orden de compra
+                var ordenCompra = new OrdenCompra
                 {
-                    OrdenCompraId = ordenCompra.Id,
-                    ProductoId = detalle.ProductoId,
-                    Cantidad = detalle.Cantidad
+                    NroOrden = ordenCompraVM.OrdenCompra.NroOrden,
+                    Fecha = ordenCompraVM.FechaActual,
+                    ProveedorId = ordenCompraVM.OrdenCompra.ProveedorId,
+                    Observaciones = ordenCompraVM.OrdenCompra.Observaciones,
+                    Estado = ordenCompraVM.OrdenCompra.Estado
                 };
 
-                _context.Add(ordenCompraDetalle);
+                // 2. Agregar la orden de compra al contexto
+                _context.Add(ordenCompra);
+                await _context.SaveChangesAsync();
+
+                var IdDeOrdenCompra = ordenCompra.Id;
+
+                // 3. Agregar detalles de la orden de compra
+                foreach (OrdenCompraDetalle detalle in ordenCompraVM.OrdenCompraDetalle)
+                {
+                    string codigoSeleccionado = detalle.Codigo;
+                    var productoIdSeleccionado = ObtenerProductoIdPorCodigo(codigoSeleccionado);
+
+                    if (productoIdSeleccionado.HasValue)
+                    {
+                        var ordenCompraDetalle = new OrdenCompraDetalle
+                        {
+                            OrdenCompraId = IdDeOrdenCompra,
+                            ProductoId = productoIdSeleccionado.Value,
+                            Codigo = detalle.Codigo,
+                            Nombre = detalle.Nombre,
+                            Cantidad = detalle.Cantidad
+                        };
+
+                        _context.Add(ordenCompraDetalle);
+                    }
+                    else
+                    {
+                        // Manejar el caso en el que no se encontró el ProductoId
+                        // Puedes mostrar un mensaje de error o tomar una acción adecuada
+                    }
+                }
+
+                // 4. Actualizar el último número de orden en la base de datos
+                ActualizarUltimoNumeroOrden(ordenCompraVM.OrdenCompra.NroOrden);
+
+                // 5. Guardar los cambios en la base de datos
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Index));
             }
-
-            // 4.Actualiza el último número de orden en la base de datos
-            ActualizarUltimoNumeroOrden(ordenCompraVM.OrdenCompra.NroOrden);
-
-            // 5.Guardar los cambios en la base de datos
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(nameof(Index));
+            catch (Exception ex)
+            {
+                // Manejar excepciones aquí, realizar rollback si es necesario
+                ModelState.AddModelError(string.Empty, "Ocurrió un error al procesar la orden de compra.");
+            }
         }
-
 
         // Si llegamos aquí, significa que hubo un error, volvemos a mostrar el formulario con los errores.
         ordenCompraVM.ProveedorLista = _context.Proveedor
@@ -134,6 +154,22 @@ public class OrdenCompraController : Controller
     }
 
     // Otras acciones del controlador...
+
+    public int? ObtenerProductoIdPorCodigo(string codigo)
+    {
+
+        var listaDeProductos = _context.Producto;
+
+        // Buscar el ProductoId por código usando LINQ
+        var producto = listaDeProductos.FirstOrDefault(p => p.Codigo == codigo);
+
+        if (producto != null)
+        {
+            return producto.Id;
+        }
+
+        return null; // Manejar el caso en el que no se encontró el ProductoId
+    }
 
     // Función para obtener el último número de orden
     private int ObtenerUltimoNumeroOrden()
