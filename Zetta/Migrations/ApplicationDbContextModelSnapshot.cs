@@ -318,6 +318,14 @@ namespace Zetta.Migrations
                         .IsRequired()
                         .HasColumnType("int");
 
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("OrdenCompraId")
                         .HasColumnType("int");
 

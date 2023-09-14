@@ -21,6 +21,12 @@ namespace Zetta.Models
         public Producto Producto { get; set; }
 
         [Required]
+        public string Codigo { get; set; }
+
+        [Required]
+        public string Nombre { get; set; }
+
+        [Required]
         public int Cantidad { get; set; }
 
     }

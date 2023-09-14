@@ -16,4 +16,14 @@ namespace Zetta.Models.ViewModels
         public int? ProductoCantidad { get; set; } // Cambiado a int? (nullable)
 
     }
+
+    public class OrdenDetalle
+    {
+        public int Cantidad { get; set; }
+        public string Codigo { get; set; }
+        public string Nombre { get; set; }
+        public int ProductoId { get; set; }
+
+
+    }
 }

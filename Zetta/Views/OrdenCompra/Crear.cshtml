@@ -46,47 +46,48 @@
         <div class="row">
             <div class="col-md-3">
                 <label asp-for="ProductoCodigo" class="form-label">Código</label>
-                <select asp-for="ProductoCodigo" asp-items="@Model.ProductoCodigoLista" class="form-select">
+                <select asp-for="ProductoCodigo" id="ProductoCodigo" asp-items="@Model.ProductoCodigoLista" class="form-select">
                     <option disabled selected>--Seleccione un Código</option>
                 </select>
             </div>
             <div class="col-md-6">
                 <label asp-for="ProductoNombre" class="form-label">Nombre</label>
-                <select asp-for="ProductoNombre" asp-items="@Model.ProductoNombreLista" class="form-select">
+                <select asp-for="ProductoNombre" id="ProductoNombre" asp-items="@Model.ProductoNombreLista" class="form-select">
                     <option disabled selected>--Seleccione un Nombre</option>
                 </select>
             </div>
 
             <div class="col-md-3">
                 <label asp-for="ProductoCantidad" class="form-label">Cantidad</label>
-                <input asp-for="ProductoCantidad" class="form-control" />
+                <input asp-for="ProductoCantidad" id="ProductoCantidad" class="form-control" />
                 <span asp-validation-for="ProductoCantidad" class="text-danger"></span>
             </div>
         </div>
         <br />
+        <div id="detalles">
+            <table id="tablaDetalle" class="table table-bordered table-striped table-hover">
+                <!-- Encabezado de la tabla -->
+                <thead>
+                    <tr class="table-dark text-center">
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Cantidad</th>
+                    </tr>
+                </thead>
 
-        <table id="tablaDetalle" class="table table-bordered table-striped table-hover">
-            <!-- Encabezado de la tabla -->
-            <thead>
-                <tr class="table-dark text-center">
-                    <th>Código</th>
-                    <th>Nombre</th>
-                    <th>Cantidad</th>
-                </tr>
-            </thead>
+                <!-- Cuerpo de la tabla donde se agregarán filas dinámicamente -->
+                <tbody>
+                </tbody>
+            </table>
 
-            <!-- Cuerpo de la tabla donde se agregarán filas dinámicamente -->
-            <tbody>
-            </tbody>
-        </table>
+        </div>
         <br />
 
-        <!-- Campo oculto para almacenar los detalles de la orden de compra en formato JSON -->
-        <input type="hidden" id="detalleJson" name="detalleJson" />
+
 
         <div class="row">
             <div class="col-md-3">
-                <button type="button" id="agregarProducto" class="btn btn-info form-control">Agregar Producto</button>
+                <button type="button" id="agregarProducto" onclick="AgregarDetalle()" class="btn btn-info form-control">Agregar Producto</button>
             </div>
 
             <div class="col-md-3">
@@ -111,43 +112,56 @@
         <partial name="_ValidationScriptsPartial" />
     }
     <script>
-        var ordenCompraVM = {}; // Declaración del objeto ViewModel
-        // Función para agregar una fila a la tabla de detalles
-        function agregarFila() {
-            var codigo = $("#ProductoCodigo").val(); // Obtén el código del producto desde un campo de entrada
-            var nombre = $("#ProductoNombre").val(); // Obtén el nombre del producto desde un campo de entrada
-            var cantidad = $("#ProductoCantidad").val(); // Obtén la cantidad desde un campo de entrada
+        var num =0;
+        function AgregarDetalle(){
+            let Codigo = document.getElementById("ProductoCodigo").value;
+            let Nombre = document.getElementById("ProductoNombre").value;
+            let Cantidad = document.getElementById("ProductoCantidad").value;
 
-            // Verifica que haya un código y una cantidad válidos antes de agregar la fila
-            if (codigo && nombre && cantidad && !isNaN(cantidad) && cantidad > 0) {
-                ordenCompraVM.ProductoCodigo = codigo; // Actualiza el código en el ViewModel
-                ordenCompraVM.ProductoNombre = nombre; // Actualiza el nombre en el ViewModel
-                ordenCompraVM.ProductoCantidad = cantidad; // Actualiza la cantidad en el ViewModel
-                // Crea una nueva fila HTML
-                var fila = "<tr>" +
-                    "<td>" + codigo + "</td>" +
-                    "<td>" + nombre + "</td>" +
-                    "<td>" + cantidad + "</td>" +
-                    "</tr>";
+            let Tabla = document.getElementById("tablaDetalle");
+            let TR = document.createElement("tr");
+            let TDCodigo = document.createElement("td");
+            let TDNombre = document.createElement("td");
+            let TDCantidad = document.createElement("td");
+            TR.appendChild(TDCodigo);
+            TR.appendChild(TDNombre);
+            TR.appendChild(TDCantidad);
+            Tabla.appendChild(TR);
+            TDCodigo.innerHTML = Codigo;
+            TDNombre.innerHTML = Nombre;
+            TDCantidad.innerHTML = Cantidad;
 
-                // Agrega la fila a la tabla de detalles
-                $("#tablaDetalle tbody").append(fila);
+            let DivDetalle = document.getElementById("detalles");
+            let HiddenCodigo = document.createElement("input");
+            let HiddenNombre = document.createElement("input");
+            let HiddenCantidad = document.createElement("input");
+           
 
-                // Limpia los campos de entrada después de agregar la fila
-                $("#ProductoCodigo").val("");
-                $("#ProductoNombre").val("");
-                $("#ProductoCantidad").val("");
-            } else {
-                // Muestra un mensaje de error o realiza alguna acción para manejar datos inválidos
-                alert("Por favor, ingrese un código válido, un nombre válido y una cantidad válida mayor a cero.");
-            }
+            HiddenCodigo.name = "OrdenCompraDetalle[" + num + "].Codigo";
+            HiddenCodigo.value = Codigo;
+            HiddenCodigo.type = "hidden";
+
+            HiddenNombre.name = "OrdenCompraDetalle[" + num + "].Nombre";
+            HiddenNombre.value = Nombre;
+            HiddenNombre.type = "hidden";
+
+            HiddenCantidad.name = "OrdenCompraDetalle[" + num + "].Cantidad";
+            HiddenCantidad.value = Cantidad;
+            HiddenCantidad.type = "hidden";
+
+            DivDetalle.appendChild(HiddenCodigo);
+            DivDetalle.appendChild(HiddenNombre);
+            DivDetalle.appendChild(HiddenCantidad);
+
+            document.getElementById("ProductoCodigo").value = "";
+            document.getElementById("ProductoNombre").value = "";
+            document.getElementById("ProductoCantidad").value = "";
+
+            num ++;
         }
-
-        // Manejador de clic en el botón "Agregar Producto"
-        $("#agregarProducto").click(function () {
-            agregarFila();
-        });
+        
     </script>
+
 
     <script>
         // Convierte las listas de códigos y nombres en arrays de JavaScript
@@ -183,17 +197,9 @@
 
     </script>
 
-   @*  <script>
-        // Manejador de clic en el botón "Confirmar Orden"
-        $("#confirmarOrden").click(function () {
-            // Verifica si hay al menos un detalle de compra en la tabla
-            if ($("#tablaDetalle tbody tr").length > 0) {
-                // Crea un array para almacenar los detalles de compra
-                var detalles = [];
+   
 
-                // Itera a través de las filas de la tabla
-                $("#tablaDetalle tbody tr").each(function () {
-                    var codigo = $(this).find("td:eq(0)").text();
+}                    var codigo = $(this).find("td:eq(0)").text();
                     var nombre = $(this).find("td:eq(1)").text();
                     var cantidad = parseInt($(this).find("td:eq(2)").text());
 
@@ -215,6 +221,4 @@
                 alert("Agregue al menos un detalle de compra antes de confirmar la orden.");
             }
         });
-    </script> *@
-
-}
+    </script> 
