@@ -7,10 +7,10 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container p-3">
-    <div class="row pt-4">
+<div class="container p-2">
+    <div class="row p-2">
         <div class="col-6">
-            <h2 class="text-info pl-3">Lista de Categorías</h2>
+            <h2 class="text-info">Lista de Categorías</h2>
         </div>
         <div class="col-6 text-end">
             <a asp-controller="Categoria" asp-action="Crear" class="btn btn-primary">
@@ -34,19 +34,19 @@
     {
         <table class="table table-bordered table-striped" style="width:100%">
             <thead>
-                <tr class ="table-dark text-center">
+                <tr class="table-dark text-center">
                     <th>
                         Nombre de Categoría
                     </th>
 
                     <th>
-
+                        Acciones
                     </th>
                 </tr>
             </thead>
 
             <tbody>
-              
+
                 @foreach (var item in Model)
                 {
                     <tr>

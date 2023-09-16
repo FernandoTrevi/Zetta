@@ -44,9 +44,11 @@
                             <select asp-for="Producto.MarcaId" asp-items="@Model.MarcaLista" class="form-select">
                                 <option disabled selected>--Seleccione una Marca</option>
                             </select>
-                            <a asp-controller="Marca" asp-action="Crear" class="btn btn-primary mt-2">
-                                <i class="bi bi-plus-circle"></i> Crear Marca
-                            </a>
+                            <div class="btn-container">
+                                <a asp-controller="Marca" asp-action="Crear" class="btn btn-primary mt-2">
+                                    <i class="bi bi-plus-circle"></i> Crear Marca
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <br />
@@ -56,9 +58,11 @@
                             <select asp-for="Producto.CategoriaId" asp-items="@Model.CategoriaLista" class="form-select">
                                 <option disabled selected>--Seleccione una Categoria</option>
                             </select>
-                            <a asp-controller="Categoria" asp-action="Crear" class="btn btn-primary mt-2">
-                                <i class="bi bi-plus-circle"></i> Crear Categoría
-                            </a>
+                            <div class="btn-container">
+                                <a asp-controller="Categoria" asp-action="Crear" class="btn btn-primary mt-2">
+                                    <i class="bi bi-plus-circle"></i> Crear Categoría
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <br />
@@ -102,7 +106,7 @@
                         </div>
                     </div>
                     <br />
-                    
+
 
                     <div class="form-group">
                         <div class="col-md-6">
@@ -120,7 +124,7 @@
                         </div>
                     </div>
                     <br />
-                    <div class="row p-1">
+                    <div class="row">
                         <div class="col-6 col-md-3">
                             @if (Model.Producto.Id != 0)
                             {
@@ -148,6 +152,18 @@
         </div>
     </div>
 </form>
+
+<style>
+    .btn-container {
+        display: flex;
+        justify-content: flex-end; /* Puedes ajustar esto según tu diseño */
+    }
+
+        .btn-container a.btn {
+            flex: 1;
+            width: 100%;
+        }
+</style>
 
 @section Scripts {
     @{
