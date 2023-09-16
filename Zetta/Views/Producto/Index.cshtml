@@ -7,10 +7,10 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container p-3">
-    <div class="row pt-4">
+<div class="container p-2">
+    <div class="row p-2">
         <div class="col-6">
-            <h2 class="text-info pl-3">Lista de Productos</h2>
+            <h2 class="text-info">Lista de Productos</h2>
         </div>
         <div class="col-6 text-end">
             <a asp-controller="Producto" asp-action="Upsert" class="btn btn-primary">
@@ -110,9 +110,13 @@
 
         </table>
 
-        <a asp-controller="Producto" asp-action="ExportarExcel" class="btn btn-primary">
-            <i class="far fa-file-excel"></i> Exportar a Excel
-        </a>
+        <div class="col-6 col-md-3">
+            <a asp-controller="Producto" asp-action="ExportarExcel" class="btn btn-primary">
+                <i class="far fa-file-excel"></i> Exportar a Excel
+            </a>
+        </div>
+
+
 
         <div class="row">
             <div class="col-md-12">
@@ -220,15 +224,11 @@
 </div>
 
 <script>
+
     function goBack() {
         window.history.back();
     }
 
-        //$(document).ready(function () {
-        //    $('#openLowStockModal').click(function () {
-        //        $('#lowStockModal').modal('show');
-        //    });
-        //});
 </script>
 
 <style>

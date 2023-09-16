@@ -3,6 +3,8 @@
     ViewData["Title"] = "VerStock";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+<form>
 <div class="container p-3">
     <div class="col-6">
         <h2 class="text-info pl-3">@Model.ProductoNombre</h2>
@@ -55,17 +57,17 @@
             }
         </tbody>
     </table>
-    <div class="row p-1">
+    <div class="row">
         <div class="col-6 col-md-3">
-            <a asp-controller="Stock" asp-action="Index" asp-route-ProductoNombre="@Model.ProductoNombre" class="btn btn-primary">Actualizar Stock</a>
+            <a asp-controller="Stock" asp-action="Index" asp-route-ProductoNombre="@Model.ProductoNombre" class="btn btn-primary form-control">Actualizar Stock</a>
         </div>
         <div class="col-6 col-md-3">
-            <a asp-controller="Producto" asp-action="Index" class="btn btn-secondary">Regresar</a>
+                <a asp-controller="Producto" asp-action="Index" class="btn btn-secondary form-control">Regresar</a>
         </div>
         
     </div>
 </div>
-
+</form>
 
 
 
