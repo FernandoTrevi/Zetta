@@ -181,7 +181,7 @@ namespace Zetta.Controllers
 
        
         // GET: ProveedorController/Eliminar
-        public async Task<ActionResult> Eliminar(int id)
+        public async Task<ActionResult> Eliminar(int? id)
         {
             var proveedor = await _db.Proveedor.FindAsync(id);
             if (proveedor == null)
@@ -194,7 +194,7 @@ namespace Zetta.Controllers
         // POST: ProveedorController/ConfirmarEliminar
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ConfirmarEliminar(int id)
+        public async Task<ActionResult> Eliminar(int id)
         {
             var proveedor = await _db.Proveedor.FindAsync(id);
             if (proveedor == null)

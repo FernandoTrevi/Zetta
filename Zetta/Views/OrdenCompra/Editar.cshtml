@@ -1,0 +1,66 @@
+﻿@model Zetta.Models.ViewModels.OrdenCompraVM
+
+@{
+    ViewData["Title"] = "Editar Orden de Compra";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form method="post" asp-action="Editar">
+    <input asp-for="OrdenCompra.Id" hidden />
+    <div class="border p-3">
+
+        <div asp-validation-summary="ModelOnly" class="text-danger">
+        </div>
+
+        <div class="form-group row">
+            <h2 class="text-info">Editar Orden de Compra</h2>
+        </div>
+        <hr />
+
+        <div class="form-group">
+            <label asp-for="OrdenCompra.NroOrden" class="control-label"></label>
+            <input asp-for="OrdenCompra.NroOrden" class="form-control" readonly />
+        </div>
+        <!-- Agrega aquí otros campos de edición de la orden de compra según tu modelo -->
+        <!-- Detalles de la orden de compra -->
+        <h3>Detalles de la Orden de Compra</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Cantidad</th>
+                    <!-- Agrega más columnas según tus detalles de orden de compra -->
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.OrdenCompraDetalle.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            <input asp-for="OrdenCompraDetalle[i].Codigo" class="form-control" />
+                        </td>
+                        <td>
+                            <input asp-for="OrdenCompraDetalle[i].Nombre" class="form-control" />
+                        </td>
+                        <td>
+                            <input asp-for="OrdenCompraDetalle[i].Cantidad" class="form-control" />
+                        </td>
+                        <!-- Agrega más celdas según tus detalles de orden de compra -->
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="form-group">
+            <input type="submit" value="Guardar Cambios" class="btn btn-primary" />
+            <a asp-action="Index" class="btn btn-default">Volver</a>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

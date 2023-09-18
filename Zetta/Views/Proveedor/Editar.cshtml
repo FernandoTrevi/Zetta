@@ -7,7 +7,7 @@
 
 <form method="post" asp-action="Editar">
     <input asp-for="Proveedor.Id" hidden />
-    <div class="border p-3 ">
+    <div class="border p-3">
 
         <div asp-validation-summary="ModelOnly" class="text-danger">
         </div>
@@ -16,7 +16,6 @@
             <h2 class="text-info pl-3">Editar Proveedor</h2>
         </div>
         <hr />
-
 
         <div class="container">
             <div class="row">
@@ -84,7 +83,7 @@
                     <input asp-for="Proveedor.Cuit" class="form-control" />
                     <span asp-validation-for="Proveedor.Cuit" class="text-danger"></span>
                 </div>
-            </div> 
+            </div>
             <br />
 
             <div class="row p-1">
@@ -104,4 +103,3 @@
         <partial name="_ValidationScriptsPartial" />
     }
 }
-

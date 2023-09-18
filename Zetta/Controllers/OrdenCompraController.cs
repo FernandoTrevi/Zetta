@@ -1,15 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Zetta.Datos;
 using Zetta.Models;
 using Zetta.Models.ViewModels;
-using static OrdenCompraController;
 
 public class OrdenCompraController : Controller
 {
@@ -35,26 +30,6 @@ public class OrdenCompraController : Controller
 
         var ordenCompraVM = new OrdenCompraVM
         {
-
-            ProveedorLista = _context.Proveedor
-                .Select(p => new SelectListItem
-                {
-                    Value = p.Id.ToString(),
-                    Text = p.Razonsocial
-                }),
-           
-            ProductoCodigoLista = _context.Producto
-                .Select(p => new SelectListItem
-                {
-                    Value = p.Codigo,
-                    Text = p.Codigo
-                }),
-            ProductoNombreLista = _context.Producto
-                .Select(p => new SelectListItem
-                {
-                    Value = p.Nombre,
-                    Text = p.Nombre
-                }),
             FechaActual = DateTime.Today,
             // Asigna el último número de orden obtenido
             OrdenCompra = new OrdenCompra { NroOrden = ultimoNumeroOrden },
@@ -62,12 +37,22 @@ public class OrdenCompraController : Controller
             OrdenCompraDetalle = new List<OrdenCompraDetalle>()
         };
 
+        // Llena las listas de selección usando el método creado
+        LlenarListasSeleccion(ordenCompraVM);
+
         return View(ordenCompraVM);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Crear(OrdenCompraVM ordenCompraVM)
+    //public async Task<IActionResult> Crear(OrdenCompraVM ordenCompraVM)
+
+    // He aplicado el atributo [Bind] al parámetro ordenCompraVM en la acción Crear.
+    // Esto permite que solo las propiedades especificadas en el atributo [Bind] se
+    // vinculen durante la asignación del modelo. Las propiedades que no estén incluidas
+    // en [Bind] no se tendrán en cuenta, lo que ayuda a proteger tu aplicación contra ataques de asignación masiva.
+
+    public async Task<IActionResult> Crear([Bind("OrdenCompra,OrdenCompraDetalle,ProveedorLista,ProductoCodigoLista,ProductoNombreLista,FechaActual")] OrdenCompraVM ordenCompraVM)
     {
         if (ModelState.IsValid)
         {
@@ -123,37 +108,159 @@ public class OrdenCompraController : Controller
 
                 return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Manejar excepciones aquí, realizar rollback si es necesario
                 ModelState.AddModelError(string.Empty, "Ocurrió un error al procesar la orden de compra.");
+
             }
         }
 
         // Si llegamos aquí, significa que hubo un error, volvemos a mostrar el formulario con los errores.
-        ordenCompraVM.ProveedorLista = _context.Proveedor
-            .Select(p => new SelectListItem
-            {
-                Value = p.Id.ToString(),
-                Text = p.Razonsocial
-            });
-        ordenCompraVM.ProductoCodigoLista = _context.Producto
-            .Select(p => new SelectListItem
-            {
-                Value = p.Codigo,
-                Text = p.Codigo
-            });
-        ordenCompraVM.ProductoNombreLista = _context.Producto
-            .Select(p => new SelectListItem
-            {
-                Value = p.Nombre,
-                Text = p.Nombre
-            });
+        // Llena las listas de selección usando el método creado
+        LlenarListasSeleccion(ordenCompraVM);
 
         return View(ordenCompraVM);
     }
 
-    // Otras acciones del controlador...
+    // GET: OrdenCompra/Editar/{id}
+    public async Task<IActionResult> Editar(int? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+
+        var ordenCompra = await _context.OrdenCompra.FindAsync(id);
+
+        if (ordenCompra == null)
+        {
+            return NotFound();
+        }
+
+        // Puedes reutilizar la vista Crear para editar
+        var ordenCompraVM = new OrdenCompraVM
+        {
+            FechaActual = DateTime.Today,
+            OrdenCompra = ordenCompra,
+            OrdenCompraDetalle = await _context.OrdenCompraDetalle.Where(od => od.OrdenCompraId == id).ToListAsync()
+        };
+
+        // Llena las listas de selección usando el método creado
+        LlenarListasSeleccion(ordenCompraVM);
+
+        return View("Editar", ordenCompraVM);
+    }
+
+    // POST: OrdenCompra/Editar/{id}
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Editar(int id, [Bind("OrdenCompra,OrdenCompraDetalle,ProveedorLista,ProductoCodigoLista,ProductoNombreLista,FechaActual")] OrdenCompraVM ordenCompraVM)
+    {
+        if (id != ordenCompraVM.OrdenCompra.Id)
+        {
+            return NotFound();
+        }
+
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                // Actualiza la orden de compra existente
+                var ordenCompra = ordenCompraVM.OrdenCompra;
+                _context.Update(ordenCompra);
+                await _context.SaveChangesAsync();
+
+                // Actualiza los detalles de la orden de compra existentes
+                var detallesExistentes = await _context.OrdenCompraDetalle.Where(od => od.OrdenCompraId == id).ToListAsync();
+
+                foreach (var detalleExistente in detallesExistentes)
+                {
+                    // Encuentra el detalle correspondiente en el modelo vinculado
+                    var detalleVinculado = ordenCompraVM.OrdenCompraDetalle.FirstOrDefault(od => od.Id == detalleExistente.Id);
+
+                    if (detalleVinculado != null)
+                    {
+                        detalleExistente.Cantidad = detalleVinculado.Cantidad;
+                        _context.Update(detalleExistente);
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!OrdenCompraExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+        // Si llegamos aquí, significa que hubo un error, volvemos a mostrar el formulario con los errores.
+        LlenarListasSeleccion(ordenCompraVM);
+
+        return View("Editar", ordenCompraVM);
+    }
+
+    // GET: OrdenCompra/Eliminar/{id}
+    public async Task<IActionResult> Eliminar(int? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+
+        var ordenCompra = await _context.OrdenCompra
+            .Include(o => o.Proveedor) // Incluye la información del proveedor
+            .FirstOrDefaultAsync(o => o.Id == id);
+
+        if (ordenCompra == null)
+        {
+            return NotFound();
+        }
+
+        // Puedes mostrar una vista de confirmación de eliminación aquí
+        // y permitir que el usuario confirme antes de eliminar realmente la orden.
+
+        return View(ordenCompra);
+    }
+
+
+
+    // POST: OrdenCompra/Eliminar/{id}
+    [HttpPost, ActionName("Eliminar")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Eliminar(int id)
+    {
+        var ordenCompra = await _context.OrdenCompra.FindAsync(id);
+
+        if (ordenCompra == null)
+        {
+            return NotFound();
+        }
+
+        // Elimina la orden de compra y sus detalles
+        _context.OrdenCompra.Remove(ordenCompra);
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction(nameof(Index));
+    }
+
+
+//------------------------------------------------------------------------
+
+    private bool OrdenCompraExists(int id)
+    {
+        return _context.OrdenCompra.Any(e => e.Id == id);
+    }
+
 
     public int? ObtenerProductoIdPorCodigo(string codigo)
     {
@@ -192,5 +299,30 @@ public class OrdenCompraController : Controller
     {
         // Puedes guardar el último número de orden en algún lugar de la base de datos
         // para usarlo como referencia en el futuro.
+    }
+
+    // Define un método privado para llenar las listas de selección
+    private void LlenarListasSeleccion(OrdenCompraVM ordenCompraVM)
+    {
+        ordenCompraVM.ProveedorLista = _context.Proveedor
+            .Select(p => new SelectListItem
+            {
+                Value = p.Id.ToString(),
+                Text = p.Razonsocial
+            });
+
+        ordenCompraVM.ProductoCodigoLista = _context.Producto
+            .Select(p => new SelectListItem
+            {
+                Value = p.Codigo,
+                Text = p.Codigo
+            });
+
+        ordenCompraVM.ProductoNombreLista = _context.Producto
+            .Select(p => new SelectListItem
+            {
+                Value = p.Nombre,
+                Text = p.Nombre
+            });
     }
 }
