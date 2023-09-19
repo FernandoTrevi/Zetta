@@ -78,6 +78,7 @@
                         <th>Código</th>
                         <th>Nombre</th>
                         <th>Cantidad</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
 
@@ -95,12 +96,10 @@
            
 
             <div class="col-md-3">
-                <button type="submit" class="btn btn-primary form-control">Confirmar Orden</button>
+                <button type="submit" class="btn btn-primary form-control" onclick="ValidarYEnviar(event)">Confirmar Orden</button>
             </div>
 
-           @*  <div class="col-md-3">
-                <button type="button" id="confirmarOrden" class="btn btn-primary form-control">Confirmar Orden</button>
-            </div> *@
+          
 
             <div class="col-md-3">
                 <a asp-controller="OrdenCompra" asp-action="Index" class="btn btn-secondary form-control">Regresar</a>
@@ -131,24 +130,62 @@
                 });
 
                 if (!existeProducto) {
+
                     let Tabla = document.getElementById("tablaDetalle");
                     let TR = document.createElement("tr");
+
+                    // Asignar un id único a la fila
+                    TR.id = "fila_" + Codigo;
+
                     let TDCodigo = document.createElement("td");
+                    TDCodigo.style.textAlign = "center";
                     let TDNombre = document.createElement("td");
                     let TDCantidad = document.createElement("td");
+                    TDCantidad.style.textAlign = "right";
+                    let TDAcciones = document.createElement("td");
+                    TDAcciones.style.textAlign = "center";
+                    let botonEditar = document.createElement("button");
+                    let botonEliminar = document.createElement("button");
+
+                    botonEditar.textContent = "Editar";
+                    botonEditar.className = "btn btn-warning";
+                    botonEditar.type = "button";
+                    botonEditar.onclick = function () {
+                        // Aquí puedes agregar la lógica para editar el detalle
+                        // Por ejemplo, abrir un modal de edición
+                    };
+
+                    botonEliminar.textContent = "Eliminar";
+                    botonEliminar.className = "btn btn-danger";
+                    botonEliminar.type = "button";
+                    botonEliminar.id = "eliminar_" + Codigo;
+                    botonEliminar.onclick = function () {
+                        // Aquí debes llamar a la función EliminarProducto sin los paréntesis
+                        EliminarProducto(this.id);
+                    };
+
+                    TDAcciones.appendChild(botonEditar);
+                    TDAcciones.appendChild(botonEliminar);
 
                     TR.appendChild(TDCodigo);
                     TR.appendChild(TDNombre);
                     TR.appendChild(TDCantidad);
+                    TR.appendChild(TDAcciones);
+
                     Tabla.appendChild(TR);
                     TDCodigo.innerHTML = Codigo;
                     TDNombre.innerHTML = Nombre;
                     TDCantidad.innerHTML = Cantidad;
 
-                    let DivDetalle = document.getElementById("detalles");
+                    let divDetalles = document.getElementById("detalles");
                     let HiddenCodigo = document.createElement("input");
                     let HiddenNombre = document.createElement("input");
                     let HiddenCantidad = document.createElement("input");
+
+                    // Crear un div para englobar los tres input ocultos
+                    let divContenedor = document.createElement("div");
+                    // Asignar el id igual al valor de Codigo
+                    divContenedor.id = Codigo;
 
                     HiddenCodigo.name = "OrdenCompraDetalle[" + num + "].Codigo";
                     HiddenCodigo.value = Codigo;
@@ -162,9 +199,13 @@
                     HiddenCantidad.value = Cantidad;
                     HiddenCantidad.type = "hidden";
 
-                    DivDetalle.appendChild(HiddenCodigo);
-                    DivDetalle.appendChild(HiddenNombre);
-                    DivDetalle.appendChild(HiddenCantidad);
+                    // Agregar los tres input ocultos al div contenedor
+                    divContenedor.appendChild(HiddenCodigo);
+                    divContenedor.appendChild(HiddenNombre);
+                    divContenedor.appendChild(HiddenCantidad);
+
+                    // Agregar el div contenedor al documento
+                    divDetalles.appendChild(divContenedor);
 
                     // Agregar el detalle al array
                     detalles.push({
@@ -187,12 +228,94 @@
             } else {
                 // Mostrar un mensaje de error si los datos son inválidos
                 alert("Por favor, ingrese un código válido, un nombre válido y una cantidad válida mayor a cero.");
-               
             }
+       
+
+        }
+
+
+        function EliminarProducto(idBotonEliminar) {
+            // Obtener el código del botón a partir del ID
+            let codigoAEliminar = idBotonEliminar.split("_")[1]; // Obtener el código del ID
+
+            console.log("Código a eliminar:", codigoAEliminar);
+
+            // Eliminar el detalle del array
+            detalles = detalles.filter(function (detalle) {
+                return detalle.Codigo !== codigoAEliminar;
+            });
+
+            // Obtener la fila de la tabla por su id y eliminarla
+            let filaAEliminar = document.getElementById("fila_" + codigoAEliminar);
+            if (filaAEliminar) {
+                filaAEliminar.parentNode.removeChild(filaAEliminar);
+            }
+
+            // Eliminar el input oculto por su id
+            let divContenedorAEliminar = document.getElementById(codigoAEliminar);
+            console.log("Contenedor a eliminar:", divContenedorAEliminar);
+
+            if (divContenedorAEliminar) {
+                // Eliminar el div
+                divContenedorAEliminar.parentNode.removeChild(divContenedorAEliminar);
+
+
+                // Llamar a la función para resetear los índices de los divs
+                ResetearIndicesDivs();
+
+                //// Recorrer los elementos restantes y reenumerar sus índices
+                //const elementosOcultos = document.querySelectorAll('input[name^="OrdenCompraDetalle"]');
+                //elementosOcultos.forEach((elemento, i) => {
+                //    const nombre = elemento.getAttribute('name');
+                //    elemento.setAttribute('name', nombre.replace(/\[\d+\]/g, `[${i}]`));
+                //});
+
+            }
+            
+        }
+
+        function ResetearIndicesDivs() {
+            // Obtener todos los divs que contienen elementos a modificar
+            const divs = document.querySelectorAll('#detalles div');
+            console.log("div a modificar:", divs);
+
+            // Inicializar un contador de índices
+            let indice = 0;
+            console.log("Indice:", indice);
+
+            // Iterar sobre cada div
+            divs.forEach((div) => {
+                // Obtener todos los elementos dentro del div
+                const elementos = div.querySelectorAll('input[name^="OrdenCompraDetalle"]');
+                console.log("elementos dentro del div:", elementos);
+
+                elementos.forEach((elemento) => {
+                    elemento.setAttribute('name', elemento.getAttribute('name').replace(/\[\d+\]/g, `[${indice}]`));
+                });
+
+                // Incrementar el contador de índices
+                indice++;
+                
+            });
+            //Decrementar el num
+            num--;
         }
 
         
+
+
+        function ValidarYEnviar(event) {
+            // Verificar si no hay productos agregados (por ejemplo, si el array de detalles está vacío)
+            if (detalles.length === 0) {
+                // Mostrar un mensaje de error o tomar cualquier otra acción que desees
+                alert("No se pueden confirmar órdenes sin productos agregados.");
+                // Cancelar la acción de envío del formulario
+                event.preventDefault();
+            }
+            // Si hay productos, el formulario se enviará normalmente
+        }
     </script>
+
 
 
     <script>
