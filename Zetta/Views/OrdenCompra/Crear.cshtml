@@ -5,10 +5,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container p-3">
-    <h2 class="text-info">Crear Orden de Compra</h2>
+<div class="border p-3">
+    <div class="form-group row">
+        <h2 class="text-info">Crear Orden de Compra</h2>
+    </div>
     <hr />
-    <br />
 
     <form asp-controller="OrdenCompra" asp-action="Crear" method="post">
         <div class="row">
@@ -39,18 +40,19 @@
         </div>
         <br />
 
-        <h3 class="text-primary">Detalles de Compra</h3>
+        <h3 class="text-info">Detalles de Compra</h3>
         <hr />
         <br />
 
-        <div class="row">
-            <div class="col-md-2">
+        <div class="row align-items-end
+">
+            <div class="col-md-3">
                 <label asp-for="ProductoCodigo" class="form-label">Código</label>
                 <select asp-for="ProductoCodigo" id="ProductoCodigo" asp-items="@Model.ProductoCodigoLista" class="form-select">
                     <option disabled selected>--Seleccione un Código</option>
                 </select>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <label asp-for="ProductoNombre" class="form-label">Nombre</label>
                 <select asp-for="ProductoNombre" id="ProductoNombre" asp-items="@Model.ProductoNombreLista" class="form-select">
                     <option disabled selected>--Seleccione un Nombre</option>
@@ -62,10 +64,10 @@
                 <input asp-for="ProductoCantidad" id="ProductoCantidad" class="form-control" />
                 <span asp-validation-for="ProductoCantidad" class="text-danger"></span>
             </div>
-            <div class="col-md-2 d-flex align-items-end">
+
+            <div class="col-md-3">
                 <button type="button" id="agregarProducto" onclick="AgregarDetalle()" class="btn btn-info form-control">Agregar Producto</button>
             </div>
-
         </div>
         <br />
         <div id="detalles">
@@ -91,7 +93,7 @@
 
 
         <div class="row">
-          
+           
 
             <div class="col-md-3">
                 <button type="submit" class="btn btn-primary form-control" onclick="ValidarYEnviar(event)">Confirmar Orden</button>

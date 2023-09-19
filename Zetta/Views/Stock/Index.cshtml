@@ -4,41 +4,36 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="border p-3">
-    <div class="form-group row">
-        <h2>Actualizar Stock</h2>
-    </div>
-    <hr />
-    @if (TempData["Mensaje"] != null)
-    {
-        <div class="alert alert-success">
-            @TempData["Mensaje"]
-        </div>
-    }
-@*<<<<<<< HEAD
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger">
-            @TempData["ErrorMessage"]
-        </div>
-    }
+<form asp-action="Index" method="post">
+    <div class="border p-3 main-container">
+        <div class="container p-2">
+            <div class="row p-2">
+                <div class="col-6">
+                    <h2 class="text-info">Actualizar Stock</h2>
+                </div>
+            </div>
+            <hr />
 
-=======
->>>>>>> 0296ec33d5d735a9780e67e0dbea906389a33586*@
-    <div class="row">
-        <div class="col-8">
+            @if (TempData["Mensaje"] != null)
+            {
+                <div class="alert alert-success">
+                    @TempData["Mensaje"]
+                </div>
+            }
+
             <div class="container">
-                <form asp-action="Index" method="post">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label asp-for="FechaActual">Fecha Actual</label>
-                            <input asp-for="FechaActual" class="form-control" readonly />
-                        </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label asp-for="FechaActual">Fecha Actual</label>
+                        <input asp-for="FechaActual" class="form-control" readonly />
                     </div>
-                    <br />
-                    @if(Model.ProductoNombre == null){
+                </div>
+                <br />
+
+                @if (Model.ProductoNombre == null)
+                {
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <label asp-for="ProductoId" class="form-label">Producto</label>
                             <select asp-for="ProductoId" asp-items="@Model.ProductoLista" class="form-select">
                                 <option disabled selected>--Seleccione un Producto--</option>
@@ -48,56 +43,58 @@
                         </div>
 
                     </div>
-                    }else{
-                        <div class="col-md-6">
-                            <label asp-for="ProductoId" class="form-label">Producto</label>
-                            <select asp-for="ProductoId" asp-items="@Model.ProductoLista" class="form-select">
-                                @foreach (var item in Model.ProductoLista)
+                }
+                else
+                {
+                    <div class="col-md-12">
+                        <label asp-for="ProductoId" class="form-label">Producto</label>
+                        <select asp-for="ProductoId" asp-items="@Model.ProductoLista" class="form-select">
+                            @foreach (var item in Model.ProductoLista)
+                            {
+                                if (item.Text == Model.ProductoNombre)
                                 {
-                                    if (item.Text == Model.ProductoNombre)
-                                    {
-                                        <option value="@item.Value" selected>@item.Text</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@item.Value">@item.Text</option>
-                                    }
+                                    <option value="@item.Value" selected>@item.Text</option>
                                 }
-                            </select>
-                            <span asp-validation-for="ProductoId" class="text-danger"></span>
-                        </div>
-                    }
-                    <br />
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label asp-for="Cantidad">Cantidad</label>
-                            <input asp-for="Cantidad" class="form-control" />
-                            <span asp-validation-for="Cantidad" class="text-danger"></span>
-                        </div>
+                                else
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            }
+                        </select>
+                        <span asp-validation-for="ProductoId" class="text-danger"></span>
                     </div>
+                }
+                <br />
 
-                    <br />
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label asp-for="Concepto" class="form-label">Concepto</label>
-                            <select asp-for="Concepto" asp-items="@Model.ConceptoLista" class="form-select">
-                                <option disabled selected>--Seleccione un concepto--</option>
-                            </select>
-                            <span asp-validation-for="Concepto" class="text-danger"></span>
-                        </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label asp-for="Cantidad">Cantidad</label>
+                        <input asp-for="Cantidad" class="form-control" />
+                        <span asp-validation-for="Cantidad" class="text-danger"></span>
                     </div>
-                    <br />
+                </div>
 
-                    <div class="row p-1">
-                        <div class="col-6 col-md-3">
-                            <button type="submit" class="btn btn-primary">Confirmar</button>
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <a asp-controller="Producto" asp-action="Index" class="btn btn-secondary">Regresar</a>
-                         @* <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Regresar</a>*@
-                        </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-12">
+                        <label asp-for="Concepto" class="form-label">Concepto</label>
+                        <select asp-for="Concepto" asp-items="@Model.ConceptoLista" class="form-select">
+                            <option disabled selected>--Seleccione un concepto--</option>
+                        </select>
+                        <span asp-validation-for="Concepto" class="text-danger"></span>
                     </div>
-                </form>
+                </div>
+                <br />
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <button type="submit" class="btn btn-primary form-control">Confirmar</button>
+                    </div>
+                    <div class="col-md-6">
+                        <a asp-controller="Producto" asp-action="Index" class="btn btn-secondary form-control">Regresar</a>
+                    </div>
+                </div>
+
                 <div>
                     @if (Model.ErrorMessages != null && Model.ErrorMessages.Count > 0)
                     {
@@ -111,10 +108,18 @@
                         </div>
                     }
                 </div>
-             </div>
+            </div>
         </div>
     </div>
-</div>
+</form>
+
+<style>
+    .main-container {
+        padding: 20px; /* Ajusta el valor según tu preferencia */
+        max-width: 600px; /* Ajusta el ancho máximo según tu preferencia */
+        margin: 0 auto; /* Para centrar el contenido */
+    }
+</style>
 
 
 
