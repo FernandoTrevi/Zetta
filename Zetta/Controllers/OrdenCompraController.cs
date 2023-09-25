@@ -15,11 +15,36 @@ public class OrdenCompraController : Controller
         _context = context;
     }
 
-    // GET: OrdenCompra/Index
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string buscar, string ordenActual, int? numpag, string filtroActual)
     {
-        var ordenCompra = await _context.OrdenCompra.Include(o => o.Proveedor).ToListAsync();
-        return View(ordenCompra);
+        IQueryable<OrdenCompra> query = _context.OrdenCompra.Include(o => o.Proveedor);
+
+        if (buscar != null)
+            numpag = 1;
+        else
+            buscar = filtroActual;
+
+        ViewData["OrdenActual"] = ordenActual;
+        ViewData["FiltroActual"] = buscar;
+
+        if (!string.IsNullOrEmpty(buscar))
+        {
+            query = query.Where(o => o.NroOrden.ToString().Contains(buscar) || o.Proveedor.Razonsocial.Contains(buscar));
+        }
+
+        if (ordenActual == "nroorden")
+        {
+            query = query.OrderBy(o => o.NroOrden);
+        }
+        else
+        {
+            query = query.OrderBy(o => o.Id); // Orden predeterminado
+        }
+
+        int cantidadregistros = 5; // Cambia esta cantidad según tus preferencias
+        var paginacion = await Paginacion<OrdenCompra>.CrearPaginacion(query, numpag ?? 1, cantidadregistros);
+
+        return View(paginacion);
     }
 
     // GET: OrdenCompra/Crear
@@ -254,7 +279,7 @@ public class OrdenCompraController : Controller
     }
 
 
-//------------------------------------------------------------------------
+    // FUNCIONES ------------------------------------------------------------------------
 
     private bool OrdenCompraExists(int id)
     {

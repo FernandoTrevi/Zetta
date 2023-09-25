@@ -28,7 +28,6 @@ namespace Zetta.Controllers
         }
 
         // GET: Producto
-        // GET: Producto
         public async Task<IActionResult> Index(string buscar, string ordenActual, int? numpag, string filtroActual)
         {
             IQueryable<Producto> query = _db.Producto.Include(m => m.Marca).Include(c => c.Categoria);
