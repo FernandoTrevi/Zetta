@@ -265,14 +265,22 @@ public class OrdenCompraController : Controller
     public async Task<IActionResult> Eliminar(int id)
     {
         var ordenCompra = await _context.OrdenCompra.FindAsync(id);
-
+        var ordenCompraId = ordenCompra.NroOrden;
         if (ordenCompra == null)
         {
             return NotFound();
         }
 
-        // Elimina la orden de compra y sus detalles
+        // Elimina la orden de compra
         _context.OrdenCompra.Remove(ordenCompra);
+
+        // Elimina las filas de OrdenCompraDetalle que coincidan con el id
+        var ordenCompraDetalles = await _context.OrdenCompraDetalle
+            .Where(d => d.OrdenCompraId == ordenCompraId)
+            .ToListAsync();
+
+        _context.OrdenCompraDetalle.RemoveRange(ordenCompraDetalles);
+
         await _context.SaveChangesAsync();
 
         return RedirectToAction(nameof(Index));
