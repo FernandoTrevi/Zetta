@@ -21,10 +21,36 @@ public class OrdenCompraController : Controller
     }
 
     // GET: OrdenCompra/Index
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string buscar, string ordenActual, int? numpag, string filtroActual)
     {
-        var ordenCompra = await _context.OrdenCompra.Include(o => o.Proveedor).ToListAsync();
-        return View(ordenCompra);
+        IQueryable<OrdenCompra> query = _context.OrdenCompra.Include(o => o.Proveedor);
+
+        if (buscar != null)
+            numpag = 1;
+        else
+            buscar = filtroActual;
+
+        ViewData["OrdenActual"] = ordenActual;
+        ViewData["FiltroActual"] = buscar;
+
+        if (!string.IsNullOrEmpty(buscar))
+        {
+            query = query.Where(o => o.NroOrden.ToString().Contains(buscar) || o.Proveedor.Razonsocial.Contains(buscar));
+        }
+
+        if (ordenActual == "nroorden")
+        {
+            query = query.OrderBy(o => o.NroOrden);
+        }
+        else
+        {
+            query = query.OrderBy(o => o.Id); // Orden predeterminado
+        }
+
+        int cantidadregistros = 5; // Cambia esta cantidad según tus preferencias
+        var paginacion = await Paginacion<OrdenCompra>.CrearPaginacion(query, numpag ?? 1, cantidadregistros);
+
+        return View(paginacion);
     }
 
     // GET: OrdenCompra/Crear
@@ -152,6 +178,59 @@ public class OrdenCompraController : Controller
 
         return View(ordenCompraVM);
     }
+
+
+    public async Task<IActionResult> Eliminar(int? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+
+        var ordenCompra = await _context.OrdenCompra
+            .Include(o => o.Proveedor) // Incluye la información del proveedor
+            .FirstOrDefaultAsync(o => o.Id == id);
+
+        if (ordenCompra == null)
+        {
+            return NotFound();
+        }
+
+        // Puedes mostrar una vista de confirmación de eliminación aquí
+        // y permitir que el usuario confirme antes de eliminar realmente la orden.
+
+        return View(ordenCompra);
+    }
+
+
+
+    // POST: OrdenCompra/Eliminar/{id}
+    [HttpPost, ActionName("Eliminar")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Eliminar(int id)
+    {
+        var ordenCompra = await _context.OrdenCompra.FindAsync(id);
+        var ordenCompraId = ordenCompra.NroOrden;
+        if (ordenCompra == null)
+        {
+            return NotFound();
+        }
+
+        // Elimina la orden de compra
+        _context.OrdenCompra.Remove(ordenCompra);
+
+        // Elimina las filas de OrdenCompraDetalle que coincidan con el id
+        var ordenCompraDetalles = await _context.OrdenCompraDetalle
+            .Where(d => d.OrdenCompraId == ordenCompraId)
+            .ToListAsync();
+
+        _context.OrdenCompraDetalle.RemoveRange(ordenCompraDetalles);
+
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction(nameof(Index));
+    }
+
 
     // Otras acciones del controlador...
 

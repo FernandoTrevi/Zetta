@@ -320,28 +320,27 @@
             // Si hay productos, el formulario se enviará normalmente
         }
 
-        // Función para abrir el modal de edición
         function AbrirModalEdicion(codigo) {
-            // Encuentra el detalle en el array detalles por su código
             const detalle = detalles.find(detalle => detalle.Codigo === codigo);
 
-            // Llena el campo de cantidad en el modal con la cantidad actual
+            // Pasa el código al modal
             document.getElementById("nuevaCantidad").value = detalle.Cantidad;
 
-            // Muestra el nombre del producto en lugar de "Nueva Cantidad"
+            // Pasa el nombre al modal
             document.getElementById("nombreProducto").textContent = detalle.Nombre;
+
+            // Pasa el código a una variable global para su uso en la función GuardarEdicion
+            ultimoCodigoSeleccionado = codigo;
 
             // Muestra el modal
             document.getElementById("modalEdicion").style.display = "block";
         }
-
 
         // Función para cerrar el modal de edición
         function CerrarModalEdicion() {
             document.getElementById("modalEdicion").style.display = "none";
         }
 
-        // Función para guardar la edición de la cantidad
         function GuardarEdicion() {
             // Obtén la nueva cantidad del campo en el modal
             const nuevaCantidad = parseInt(document.getElementById("nuevaCantidad").value);
@@ -349,13 +348,21 @@
             // Encuentra el detalle en el array detalles por su código
             const detalle = detalles.find(detalle => detalle.Codigo === ultimoCodigoSeleccionado);
 
-            // Actualiza la cantidad en el objeto detalle y en la fila de la tabla
-            detalle.Cantidad = nuevaCantidad;
-            document.getElementById("fila_" + ultimoCodigoSeleccionado).querySelector("td:nth-child(3)").textContent = nuevaCantidad;
+            // Actualiza la cantidad solo para el producto seleccionado
+            if (detalle) {
+                detalle.Cantidad = nuevaCantidad;
+
+                // Actualiza la cantidad en la fila de la tabla correspondiente
+                const fila = document.getElementById("fila_" + ultimoCodigoSeleccionado);
+                if (fila) {
+                    fila.querySelector("td:nth-child(3)").textContent = nuevaCantidad;
+                }
+            }
 
             // Cierra el modal de edición
             CerrarModalEdicion();
         }
+
 
 
     </script>
