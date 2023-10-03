@@ -1,0 +1,60 @@
+﻿@model Zetta.Models.OrdenCompra
+
+@{
+    ViewData["Title"] = "Eliminar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form method="post" asp-action="Eliminar">
+    <input asp-for="Id" hidden />
+    <div class="border p-3">
+        <div class="form-group row">
+            <h2 class="text-danger">Eliminar Orden de Compra</h2>
+        </div>
+        <hr />
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <label asp-for="NroOrden" class="form-label">Nro de Orden</label>
+                    <input asp-for="NroOrden" disable class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Fecha" class="form-label">Fecha</label>
+                    <input type="text" class="form-control" asp-for="Fecha" value="@Model.Fecha.ToString("dd-MM-yyyy")" readonly />
+                </div>
+
+            </div>
+            <br />
+
+            <div class="row">
+                <div class="col-md-6">
+                    <label asp-for="Proveedor" class="form-label">Proveedor</label>
+                    <input asp-for="ProveedorId" hidden class="form-control" />
+                    <input asp-for="Proveedor.Razonsocial" disabled class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Observaciones" class="form-label">Observaciones</label>
+                    <input asp-for="Observaciones" disable class="form-control" />
+                </div>
+            </div>
+            <br />
+
+            <div class="row">
+                <div class="col-6 col-md-3">
+                    <button type="submit" class="btn btn-danger form-control">Confirmar Eliminar</button>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a asp-controller="OrdenCompra" asp-action="Index" class="btn btn-secondary form-control">Cancelar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
+
