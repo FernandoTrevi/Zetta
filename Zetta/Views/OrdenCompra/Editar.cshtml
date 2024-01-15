@@ -1,0 +1,406 @@
+﻿@model Zetta.Models.ViewModels.OrdenCompraVM
+
+@{
+    ViewData["Title"] = "Editar Orden de Compra";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="border p-3">
+    <div class="form-group row">
+        <h2 class="text-info">Editar Orden de Compra</h2>
+    </div>
+    <hr />
+
+    <form asp-controller="OrdenCompra" asp-action="Editar" method="post">
+        <div class="row">
+            <div class="col-md-6">
+                <label asp-for="OrdenCompra.NroOrden" class="form-label">Nro de Orden</label>
+                <input asp-for="OrdenCompra.NroOrden" id="OrdenCompra_NroOrden" class="form-control" readonly />
+                <span asp-validation-for="OrdenCompra.NroOrden" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="OrdenCompra.Fecha" class="form-label">Fecha</label>
+                <input asp-for="OrdenCompra.Fecha" id="OrdenCompra_Fecha" class="form-control" readonly />
+            </div>
+        </div>
+        <br />
+
+        <div class="row">
+            <div class="col-md-6">
+                <label asp-for="OrdenCompra.ProveedorId" class="form-label">Proveedor</label>
+                <input asp-for="OrdenCompra.ProveedorId" id="OrdenCompra_ProveedorId" class="form-control" hidden>
+                <p>@Model.OrdenCompra.Proveedor.Razonsocial</p>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="OrdenCompra.Observaciones" class="form-label">Observaciones</label>
+                <input asp-for="OrdenCompra.Observaciones" id="OrdenCompra_Observaciones" class="form-control" />
+                <span asp-validation-for="OrdenCompra.Observaciones" class="text-danger"></span>
+            </div>
+        </div>
+        <br />
+
+        <h3 class="text-info">Detalles de Compra</h3>
+        <hr />
+        <br />
+
+        <div class="row align-items-end">
+            <div class="col-md-3">
+                <label asp-for="ProductoCodigo" class="form-label">Código</label>
+                <select asp-for="ProductoCodigo" id="ProductoCodigo" asp-items="@Model.ProductoCodigoLista" class="form-select">
+                    <option disabled selected>--Seleccione un Código</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="ProductoNombre" class="form-label">Nombre</label>
+                <select asp-for="ProductoNombre" id="ProductoNombre" asp-items="@Model.ProductoNombreLista" class="form-select">
+                    <option disabled selected>--Seleccione un Nombre</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label asp-for="ProductoCantidad" class="form-label">Cantidad</label>
+                <input asp-for="ProductoCantidad" id="ProductoCantidad" class="form-control" />
+                <span asp-validation-for="ProductoCantidad" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3">
+                <button type="button" id="agregarProducto" onclick="AgregarDetalle()" class="btn btn-info form-control">Agregar Producto</button>
+            </div>
+        </div>
+        <br />
+        <div id="detalles">
+            <table id="tablaDetalle" class="table table-bordered table-striped table-hover">
+                <!-- Encabezado de la tabla -->
+                <thead>
+                    <tr class="table-dark text-center">
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Cantidad</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+               
+                <tbody>
+                    @foreach (var detalle in Model.OrdenCompraDetalle)
+                    {
+                        <tr id="fila_@detalle.Codigo">
+                            <td>@detalle.Codigo</td>
+                            <td>@detalle.Producto.Nombre</td>
+                            <td>@detalle.Cantidad</td>
+                            <td>
+                                <button type="button" class="btn btn-primary" onclick="AbrirModalEdicion('@detalle.Producto.Codigo', '@detalle.Producto.Nombre', @detalle.Cantidad)">Editar</button>
+                                <button type="button" class="btn btn-danger" onclick="EliminarDetalle('@detalle.Producto.Codigo')">Eliminar</button>
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
+        <br />
+
+
+
+        <div class="row">
+
+
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary form-control" onclick="ValidarYEnviar(event)">Confirmar Cambios</button>
+            </div>
+
+
+
+            <div class="col-md-3">
+                <a asp-controller="OrdenCompra" asp-action="Index" class="btn btn-secondary form-control">Regresar</a>
+            </div>
+        </div>
+        <br />
+
+    </form>
+    <div id="modalEdicion" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="CerrarModalEdicion()">&times;</span>
+            <h2 id="nombreProducto"></h2> <!-- Mostrará el nombre del producto -->
+            <label for="nuevaCantidad">Nueva Cantidad:</label>
+            <input type="number" id="nuevaCantidad">
+            <button onclick="GuardarEdicion()">Guardar</button>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+    <script>
+        function AgregarDetalle() {
+            let Codigo = document.getElementById("ProductoCodigo").value;
+            let Nombre = document.getElementById("ProductoNombre").value;
+            let Cantidad = document.getElementById("ProductoCantidad").value;
+
+            if (Codigo && Nombre && Cantidad && !isNaN(Cantidad) && Cantidad > 0) {
+                // Crear una nueva fila en la tabla
+                let Tabla = document.getElementById("tablaDetalle");
+                let TR = Tabla.insertRow();
+
+                let TDCodigo = TR.insertCell();
+                let TDNombre = TR.insertCell();
+                let TDCantidad = TR.insertCell();
+                let TDAcciones = TR.insertCell();  // Añadir celda para acciones
+
+                TDCodigo.innerHTML = Codigo;
+                TDNombre.innerHTML = Nombre;
+                TDCantidad.innerHTML = Cantidad;
+
+                TR.id = "fila_" + Codigo;  // Asignar id a la fila
+
+                let botonEditar = document.createElement("button");
+                botonEditar.textContent = "Editar";
+                botonEditar.className = "btn btn-primary";
+                botonEditar.type = "button";
+                botonEditar.onclick = function () {
+                    // Llama a la función para abrir el modal de edición
+                    AbrirModalEdicion(Codigo, Nombre, Cantidad);
+                };
+
+                let botonEliminar = document.createElement("button");
+                botonEliminar.textContent = "Eliminar";
+                botonEliminar.className = "btn btn-danger";
+                botonEliminar.type = "button";
+                botonEliminar.style.marginLeft = "5px";
+                botonEliminar.onclick = function () {
+                    EliminarDetalle(Codigo);
+                };
+
+                TDAcciones.appendChild(botonEditar);
+                TDAcciones.appendChild(botonEliminar);
+
+                // Limpiar los campos
+                document.getElementById("ProductoCodigo").value = "";
+                document.getElementById("ProductoNombre").value = "";
+                document.getElementById("ProductoCantidad").value = "";
+
+            } else {
+                // Mostrar un mensaje de error si los datos son inválidos
+                alert("Por favor, ingrese un código válido, un nombre válido y una cantidad válida mayor a cero.");
+            }
+        }
+
+        function EliminarDetalle(codigo) {
+            // Obtener el id de la fila
+            var filaId = "fila_" + codigo;
+
+            // Eliminar la fila de la tabla
+            var fila = document.getElementById(filaId);
+            if (fila) {
+                fila.remove();
+            }
+        }
+
+        function AbrirModalEdicion(codigo, nombre, cantidad) {
+            // Pasa la cantidad al modal
+            document.getElementById("nuevaCantidad").value = cantidad;
+
+            // Pasa el nombre al modal
+            document.getElementById("nombreProducto").textContent = nombre;
+
+            // Pasa el código a una variable global para su uso en la función GuardarEdicion
+            ultimoCodigoSeleccionado = codigo;
+
+            // Muestra el modal
+            document.getElementById("modalEdicion").style.display = "block";
+        }
+
+        function CerrarModalEdicion() {
+            document.getElementById("modalEdicion").style.display = "none";
+        }
+
+        function GuardarEdicion() {
+            // Obtén la nueva cantidad del campo en el modal
+            const nuevaCantidad = parseInt(document.getElementById("nuevaCantidad").value);
+
+            if (!isNaN(nuevaCantidad) && nuevaCantidad > 0) {
+                const fila = document.getElementById("fila_" + ultimoCodigoSeleccionado);
+                if (fila) {
+                    fila.querySelector("td:nth-child(3)").textContent = nuevaCantidad;
+                }
+
+                // Cierra el modal de edición
+                CerrarModalEdicion();
+            } else {
+                alert("Por favor, ingrese una cantidad válida mayor a cero.");
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////
+
+        function ValidarYEnviar(event) {
+            // Evitar que el formulario se envíe directamente (ya que estamos manejando la lógica manualmente)
+            event.preventDefault();
+
+            // Obtener la orden de compra del formulario
+            let ordenCompra = {
+                Id: @Model.OrdenCompra.Id, 
+                NroOrden: document.getElementById("OrdenCompra_NroOrden").value,  // Reemplaza "OrdenCompra_NroOrden" con el ID real del input
+                Fecha: document.getElementById("OrdenCompra_Fecha").value,  // Reemplaza "OrdenCompra_Fecha" con el ID real del input
+                ProveedorId: document.getElementById("OrdenCompra_ProveedorId").value,
+                Observaciones: document.getElementById("OrdenCompra_Observaciones").value,
+            };
+
+            // Obtener los detalles de la tabla
+            let detallesTabla = ObtenerDatosTabla();
+
+            // Crear un objeto con los datos a enviar
+            let datosEnviar = {
+                OrdenCompra: ordenCompra,
+                OrdenCompraDetalle: detallesTabla
+            };
+
+            // Realizar la solicitud POST al controlador
+            fetch('/OrdenCompra/Editar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(datosEnviar)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Manejar la respuesta del servidor si es necesario
+                    console.log(data);
+                    // Verificar si la respuesta es exitosa antes de redirigir
+                    if (data.respuesta) {
+                        // Redirigir al índice u otra página
+                        window.location.href = '/OrdenCompra/Index'; 
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al enviar la solicitud:', error);
+                });
+        }
+
+        function ObtenerDatosTabla() {
+            let datosArray = [];
+
+            // Obtener la tabla
+            let tabla = document.getElementById("tablaDetalle");
+
+            // Iterar sobre las filas de la tabla (empezando desde 1 para omitir la fila de encabezado)
+            for (let i = 1; i < tabla.rows.length; i++) {
+                let fila = tabla.rows[i];
+                let codigo = fila.cells[0].innerText;  // la celda 0 contiene el código
+                let nombre = fila.cells[1].innerText;  // la celda 1 contiene el nombre
+                let cantidad = parseInt(fila.cells[2].innerText);  // la celda 2 contiene la cantidad
+
+                // Crear un objeto con los datos de la fila
+                let detalle = {
+                    Codigo: codigo,
+                    Nombre: nombre,
+                    Cantidad: cantidad
+                };
+
+                // Agregar el objeto al array
+                datosArray.push(detalle);
+            }
+
+            return datosArray;
+        }
+
+
+    </script>
+
+    <script>
+        // Convierte las listas de códigos y nombres en arrays de JavaScript
+        var productoCodigoLista = @Html.Raw(Json.Serialize(Model.ProductoCodigoLista.Select(x => x.Value).ToList()));
+        var productoNombreLista = @Html.Raw(Json.Serialize(Model.ProductoNombreLista.Select(x => x.Value).ToList()));
+
+        var ultimoCodigoSeleccionado = ""; // Variable para rastrear el último código seleccionado
+        var ultimoNombreSeleccionado = ""; // Variable para rastrear el último nombre seleccionado
+
+        // Agregar un evento de cambio para el campo ProductoNombre
+        $("#ProductoCodigo, #ProductoNombre").on("input change", function () {
+            var codigoSeleccionado = $("#ProductoCodigo").val();
+            var nombreSeleccionado = $("#ProductoNombre").val();
+
+            if (codigoSeleccionado !== ultimoCodigoSeleccionado) {
+                // Si se cambió el código, autocompletar el campo nombre
+                var indiceCodigo = productoCodigoLista.indexOf(codigoSeleccionado);
+                if (indiceCodigo !== -1) {
+                    var nombreCorrespondiente = productoNombreLista[indiceCodigo];
+                    $("#ProductoNombre").val(nombreCorrespondiente);
+                }
+                ultimoCodigoSeleccionado = codigoSeleccionado;
+            } else if (nombreSeleccionado !== ultimoNombreSeleccionado) {
+                // Si se cambió el nombre, autocompletar el campo código
+                var indiceNombre = productoNombreLista.indexOf(nombreSeleccionado);
+                if (indiceNombre !== -1) {
+                    var codigoCorrespondiente = productoCodigoLista[indiceNombre];
+                    $("#ProductoCodigo").val(codigoCorrespondiente);
+                }
+                ultimoNombreSeleccionado = nombreSeleccionado;
+            }
+        });
+
+    </script>
+    <style>
+        /* Estilos para el modal */
+        .modal {
+            display: none; /* Por defecto, el modal está oculto */
+            position: fixed;
+            top: 70px; /* Margen superior de 70px */
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Fondo semi-transparente */
+            z-index: 1000; /* Valor alto para que esté en la parte superior */
+        }
+
+        .modal-content {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            max-width: 400px;
+            margin: 0 auto; /* Centrar horizontalmente */
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Estilos para el botón de cerrar el modal */
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+
+        /* Estilos para el campo de entrada y el botón en el modal */
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+            button:hover {
+                background-color: #0056b3;
+            }
+
+    </style>
+}

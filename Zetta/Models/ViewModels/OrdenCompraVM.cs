@@ -11,6 +11,7 @@ namespace Zetta.Models.ViewModels
         public IEnumerable<SelectListItem> ProductoCodigoLista { get; set; } // Lista de códigos de productos
         public IEnumerable<SelectListItem> ProductoNombreLista { get; set; } // Lista de nombres de productos
         public DateTime FechaActual { get; set; }
+        public int ProductoIdSel { get; set; }// Id del producto seleccionado
         public string ProductoCodigo { get; set; } // Código del producto seleccionado
         public string ProductoNombre { get; set; } // Nombre del producto seleccionado
         public int? ProductoCantidad { get; set; } // Cambiado a int? (nullable)

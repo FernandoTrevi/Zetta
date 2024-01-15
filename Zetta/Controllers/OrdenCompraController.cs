@@ -1,15 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Zetta.Datos;
 using Zetta.Models;
 using Zetta.Models.ViewModels;
-using static OrdenCompraController;
 
 public class OrdenCompraController : Controller
 {
@@ -68,7 +62,7 @@ public class OrdenCompraController : Controller
                     Value = p.Id.ToString(),
                     Text = p.Razonsocial
                 }),
-           
+
             ProductoCodigoLista = _context.Producto
                 .Select(p => new SelectListItem
                 {
@@ -178,6 +172,109 @@ public class OrdenCompraController : Controller
 
         return View(ordenCompraVM);
     }
+
+    public async Task<ActionResult> Editar(int id)
+    {
+        var ordenCompra = await _context.OrdenCompra
+                .Include(o => o.Proveedor)
+                .Include(o => o.OrdenCompraDetalle)
+                    .ThenInclude(od => od.Producto)
+                .FirstOrDefaultAsync(o => o.Id == id);
+        if (ordenCompra == null)
+        {
+            return NotFound();
+        }
+        // Crear un objeto OrdenCompraVM y asignar la orden recuperada
+        OrdenCompraVM ordenCompraVM = new OrdenCompraVM()
+        {
+            OrdenCompra = ordenCompra,
+            OrdenCompraDetalle = ordenCompra.OrdenCompraDetalle,
+            ProductoCodigoLista = _context.Producto
+                .Select(p => new SelectListItem
+                {
+                    Value = p.Codigo,
+                    Text = p.Codigo
+                }),
+            ProductoNombreLista = _context.Producto
+                .Select(p => new SelectListItem
+                {
+                    Value = p.Nombre,
+                    Text = p.Nombre
+                }),
+            ProductoIdSel = id
+        };
+        return View(ordenCompraVM);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Editar([FromBody] OrdenCompraVM ordenCompraVM)
+    {
+        try
+        {
+            // Obtén la orden de compra existente con detalles desde la base de datos
+            OrdenCompra ordenCompraExistente = await _context.OrdenCompra
+                .Include(o => o.OrdenCompraDetalle)
+                .FirstOrDefaultAsync(o => o.Id == ordenCompraVM.OrdenCompra.Id);
+
+            if (ordenCompraExistente != null)
+            {
+                // Actualiza las propiedades de la orden de compra
+                _context.Entry(ordenCompraExistente).CurrentValues.SetValues(ordenCompraVM.OrdenCompra);
+
+
+                // Actualiza los detalles de la orden
+                ActualizarDetallesOrdenCompra(ordenCompraExistente, ordenCompraVM.OrdenCompraDetalle);
+
+                // Guarda los cambios en la base de datos
+                await _context.SaveChangesAsync();
+
+                return Json(new { respuesta = true });
+            }
+
+            return Json(new { respuesta = false, mensaje = "Orden de compra no encontrada" });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { respuesta = false, mensaje = ex.Message });
+        }
+    }
+
+    private void ActualizarDetallesOrdenCompra(OrdenCompra ordenCompra, List<OrdenCompraDetalle> nuevosDetalles)
+    {
+        // Elimina los detalles existentes que tienen el mismo Id que los nuevos detalles
+        var detallesEliminar = ordenCompra.OrdenCompraDetalle
+            .Where(detalle => detalle.OrdenCompraId == ordenCompra.Id)
+            .ToList();
+
+        foreach (var detalleEliminar in detallesEliminar)
+        {
+            //// Desvincula la entidad antes de eliminarla
+            //_context.Entry(detalleEliminar).State = EntityState.Detached;
+            ordenCompra.OrdenCompraDetalle.Remove(detalleEliminar);
+        }
+
+        var detallesAgregar = nuevosDetalles
+            .Select(nuevoDetalle =>
+            {
+                var nuevoDetalleInstancia = new OrdenCompraDetalle
+                {
+                    ProductoId = ObtenerProductoIdPorCodigo(nuevoDetalle.Codigo).Value,
+                    Cantidad = nuevoDetalle.Cantidad,
+                    Codigo = nuevoDetalle.Codigo,
+                    Nombre = nuevoDetalle.Nombre,
+                    OrdenCompra = ordenCompra
+                };
+                return nuevoDetalleInstancia;
+            })
+            .ToList();
+
+        foreach (var nuevoDetalle in detallesAgregar)
+        {
+            ordenCompra.OrdenCompraDetalle.Add(nuevoDetalle);
+        }
+
+    }
+
 
 
     public async Task<IActionResult> Eliminar(int? id)
