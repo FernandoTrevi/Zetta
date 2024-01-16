@@ -31,6 +31,7 @@
                 <select asp-for="OrdenCompra.ProveedorId" asp-items="@Model.ProveedorLista" class="form-select">
                     <option disabled selected>--Seleccione un Proveedor</option>
                 </select>
+                <span asp-validation-for="OrdenCompra.ProveedorId" class="text-danger"></span>
             </div>
             <div class="col-md-6">
                 <label asp-for="OrdenCompra.Observaciones" class="form-label">Observaciones</label>
