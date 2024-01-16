@@ -239,6 +239,43 @@ public class OrdenCompraController : Controller
         }
     }
 
+    //GET
+    public async Task<ActionResult> Ver(int id)
+    {
+        var ordenCompra = await _context.OrdenCompra
+                .Include(o => o.Proveedor)
+                .Include(o => o.OrdenCompraDetalle)
+                    .ThenInclude(od => od.Producto)
+                .FirstOrDefaultAsync(o => o.Id == id);
+        if (ordenCompra == null)
+        {
+            return NotFound();
+        }
+        // Crear un objeto OrdenCompraVM y asignar la orden recuperada
+        OrdenCompraVM ordenCompraVM = new OrdenCompraVM()
+        {
+            OrdenCompra = ordenCompra,
+            OrdenCompraDetalle = ordenCompra.OrdenCompraDetalle,
+            ProductoCodigoLista = _context.Producto
+                .Select(p => new SelectListItem
+                {
+                    Value = p.Codigo,
+                    Text = p.Codigo
+                }),
+            ProductoNombreLista = _context.Producto
+                .Select(p => new SelectListItem
+                {
+                    Value = p.Nombre,
+                    Text = p.Nombre
+                }),
+            ProductoIdSel = id
+        };
+        return View(ordenCompraVM);
+    }
+
+
+
+    //
     private void ActualizarDetallesOrdenCompra(OrdenCompra ordenCompra, List<OrdenCompraDetalle> nuevosDetalles)
     {
         // Elimina los detalles existentes que tienen el mismo Id que los nuevos detalles

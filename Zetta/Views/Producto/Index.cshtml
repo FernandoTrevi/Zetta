@@ -149,38 +149,7 @@
     {
         <p>No hay registros de Productos</p>
     }
-    @* <div id="productosBajoStock" class="mt-4">
-    <h3>Productos con Bajo Stock</h3>
-    <table class="table table-bordered table-striped" style="width:100%">
-    <thead>
-    <tr class="table-dark text-center">
-    <th>
-    Codigo
-    </th>
-    <th>
-    Producto
-    </th>
-    <th>
-    Stock Mínimo
-    </th>
-    <th>
-    Stock Actual
-    </th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var item in Model.Where(p => p.Stock < p.StockMinimo))
-    {
-    <tr>
-    <td>@item.Codigo</td>
-    <td>@item.Nombre</td>
-    <td>@item.StockMinimo</td>
-    <td>@item.Stock</td>
-    </tr>
-    }
-    </tbody>
-    </table>
-    </div>*@
+  
     <div class="modal" id="lowStockModal" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-xl" role="document">
             <!-- Agregado: modal-lg para hacerlo más grande -->
