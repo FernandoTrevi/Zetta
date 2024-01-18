@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Zetta.Datos;
 using Zetta.Models;
 using Zetta.Models.ViewModels;
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Element;
 
 public class OrdenCompraController : Controller
 {
@@ -245,7 +248,7 @@ public class OrdenCompraController : Controller
         var ordenCompra = await _context.OrdenCompra
                 .Include(o => o.Proveedor)
                 .Include(o => o.OrdenCompraDetalle)
-                    .ThenInclude(od => od.Producto)
+                .ThenInclude(od => od.Producto)
                 .FirstOrDefaultAsync(o => o.Id == id);
         if (ordenCompra == null)
         {
@@ -273,9 +276,6 @@ public class OrdenCompraController : Controller
         return View(ordenCompraVM);
     }
 
-
-
-    //
     private void ActualizarDetallesOrdenCompra(OrdenCompra ordenCompra, List<OrdenCompraDetalle> nuevosDetalles)
     {
         // Elimina los detalles existentes que tienen el mismo Id que los nuevos detalles
@@ -405,5 +405,54 @@ public class OrdenCompraController : Controller
     {
         // Puedes guardar el último número de orden en algún lugar de la base de datos
         // para usarlo como referencia en el futuro.
+    }
+    public async Task<IActionResult> DescargarPDF(int id)
+    {
+        try
+        {
+            // Obtener la orden de compra con sus detalles desde la base de datos
+            var ordenCompra = await _context.OrdenCompra
+                .Include(o => o.Proveedor)
+                .Include(o => o.OrdenCompraDetalle)
+                .ThenInclude(od => od.Producto)
+                .FirstOrDefaultAsync(o => o.Id == id);
+
+            if (ordenCompra == null)
+            {
+                return NotFound(); // Devolver un resultado NotFound si no se encuentra la orden de compra
+            }
+
+            // Generar el nombre del archivo PDF
+            string nombreArchivoPDF = $"OrdenCompra_{ordenCompra.NroOrden}.pdf";
+            string rutaArchivoPDF = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "archivosPDF", nombreArchivoPDF);
+
+            // Utilizar iText7 para generar el PDF
+            using (PdfWriter pdfWriter = new(rutaArchivoPDF))
+            {
+                using PdfDocument pdfDocument = new(pdfWriter);
+                Document document = new(pdfDocument);
+
+                // Agregar contenido al documento PDF
+                document.Add(new Paragraph($"Orden de Compra Nro. {ordenCompra.NroOrden}"));
+                document.Add(new Paragraph($"Fecha: {ordenCompra.Fecha:dd/MM/yyyy}"));
+
+                // Agregar más contenido según tus necesidades
+                document.Add(new Paragraph("Detalle de Productos:"));
+                foreach (var detalle in ordenCompra.OrdenCompraDetalle)
+                {
+                    document.Add(new Paragraph($"{detalle.Producto.Codigo} - {detalle.Producto.Nombre} - Cantidad: {detalle.Cantidad}"));
+                }
+
+                // No es necesario cerrar el documento explícitamente, ya que se hace automáticamente al salir del bloque using
+            }
+
+            // Devolver la ruta del archivo PDF generado
+            return Json(new { rutaArchivoPDF });
+        }
+        catch (Exception ex)
+        {
+            // Manejar excepciones aquí
+            return Json(new { error = ex.Message });
+        }
     }
 }

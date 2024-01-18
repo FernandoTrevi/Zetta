@@ -83,6 +83,53 @@
 </div>
 @section Scripts{
 
+    <script>
+        function descargarPDF() {
+            // Obtener el ID de la orden de compra desde el modelo
+            var ordenCompraId = @Model.OrdenCompra.Id;
+
+            // Hacer una solicitud AJAX para descargar el PDF
+            $.ajax({
+                url: '@Url.Action("DescargarPDF", "OrdenCompra")',
+                type: 'GET',
+                data: { id: ordenCompraId },
+                success: function (data) {
+                    // Verificar si se generó el PDF correctamente
+                    if (data.rutaArchivoPDF) {
+                        // Crear un enlace temporal y simular clic para descargar el archivo
+                        var link = document.createElement('a');
+                        link.href = data.rutaArchivoPDF;
+                        link.download = 'OrdenCompra.pdf';
+                        link.click();
+
+                        // Mostrar mensaje de éxito con Sweet Alert
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'PDF Descargado',
+                            text: 'El archivo PDF se ha descargado correctamente.',
+                        });
+                    } else if (data.error) {
+                        // Mostrar mensaje de error con Sweet Alert
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error al generar el PDF',
+                            text: 'Hubo un error al generar el PDF. Por favor, inténtalo de nuevo.',
+                        });
+                    }
+                },
+                error: function (error) {
+                    // Mostrar mensaje de error en caso de fallo de la solicitud AJAX
+                    console.error('Error en la solicitud AJAX: ' + error.statusText);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error en la solicitud AJAX',
+                        text: 'Hubo un error en la solicitud AJAX. Por favor, inténtalo de nuevo.',
+                    });
+                }
+            });
+        }
+    </script>
+
     <style type="text/css" media="print">
     body {
         font-size: 12pt;
