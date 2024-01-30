@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using Zetta.Datos;
@@ -21,7 +20,7 @@ namespace Zetta.Controllers
 
         public IActionResult Index()
         {
-            HomeVM homeVM = new HomeVM()
+            HomeVM homeVM = new()
             {
                 Productos = _db.Producto.Include(m => m.Marca).Include(c => c.Categoria),
                 Categorias = _db.Categoria                
@@ -31,13 +30,13 @@ namespace Zetta.Controllers
 
         public IActionResult Detalle(int Id) 
         {
-            List<CarroCompra> carroComprasList = new List<CarroCompra>();
+            List<CarroCompra> carroComprasList = new();
             if (HttpContext.Session.Get<IEnumerable<CarroCompra>>(WC.SessionCarroCompras) != null &&
                 HttpContext.Session.Get<IEnumerable<CarroCompra>>(WC.SessionCarroCompras).Count() > 0)
             {
                 carroComprasList = HttpContext.Session.Get<List<CarroCompra>>(WC.SessionCarroCompras);
             }
-            DetalleVM detalleVM = new DetalleVM
+            DetalleVM detalleVM = new()
             {
                 Producto = _db.Producto.Include(m => m.Marca).Include(c => c.Categoria)
                 .Where(p=>p.Id == Id).FirstOrDefault(),
@@ -56,7 +55,7 @@ namespace Zetta.Controllers
         [HttpPost, ActionName("Detalle")]
         public IActionResult DetallePost(int Id)
         {
-            List<CarroCompra>carroComprasList = new List<CarroCompra>();
+            List<CarroCompra>carroComprasList = new();
             if(HttpContext.Session.Get<IEnumerable<CarroCompra>>(WC.SessionCarroCompras) != null &&
                 HttpContext.Session.Get<IEnumerable<CarroCompra>>(WC.SessionCarroCompras).Count() > 0)
             {
@@ -69,7 +68,7 @@ namespace Zetta.Controllers
 
         public IActionResult RemoverDeCarro(int Id)
         {
-            List<CarroCompra> carroComprasList = new List<CarroCompra>();
+            List<CarroCompra> carroComprasList = new();
             if (HttpContext.Session.Get<IEnumerable<CarroCompra>>(WC.SessionCarroCompras) != null &&
                 HttpContext.Session.Get<IEnumerable<CarroCompra>>(WC.SessionCarroCompras).Count() > 0)
             {
