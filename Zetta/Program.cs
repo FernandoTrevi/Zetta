@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using Zetta.Datos;
 using Zetta.Utilidades;
+using DinkToPdf;
+using DinkToPdf.Contracts;
+using Zetta.Extension;
 
 /*
  * Este m?todo inicializa una nueva instancia de la WebApplicationBuilder clase con valores predeterminados preconfigurados.
@@ -48,6 +51,10 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddTransient<IEmailSender, EmailSender>();
+
+var context = new CustomAssemblyLoadContext();
+context.LoadUnmanagedLibrary(Path.Combine(Directory.GetCurrentDirectory(), "LibreriaPDF/libwkhtmltox.dll"));
+builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 
 var app = builder.Build();
 

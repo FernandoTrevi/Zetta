@@ -1,0 +1,60 @@
+﻿<!-- OrdenCompraPartial.cshtml -->
+<div class="row mt-3">
+    <div class="col-sm-6">
+        <!-- Datos de la empresa -->
+        <img src="\imagenes\LogoZETTA.jpeg" alt="Logo de la empresa" class="img-fluid" style="max-height: 40px;">
+        <p style="margin-bottom: 1px;">Sebastián Vera 383, (5800) Río Cuarto, Córdoba.</p>
+        <p style="margin-bottom: 1px;"><i class="bi bi-envelope-at"></i> ventas@zettacomputacion.com.ar</p>
+        <p style="margin-bottom: 1px;"><i class="bi bi-whatsapp"></i> 3585167469</p>
+    </div>
+
+    <div class="col-sm-6 text-md-end">
+        <!-- Número de OrdenCompra y fecha -->
+        <h3 class="mb-3"><strong>Orden de Compra Nro. # @Model.OrdenCompra.NroOrden</strong></h3>
+        <h5><strong>Fecha: @Model.OrdenCompra.Fecha.ToString("dd/MM/yyyy")</strong></h5>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-sm-6">
+        <!-- Datos del proveedor -->
+        <h5><strong>Datos del Proveedor</strong></h5>
+        <p style="margin-bottom: 5px;"><strong>Nombre:</strong> @Model.OrdenCompra.Proveedor.Razonsocial</p>
+        <p style="margin-bottom: 5px;"><strong>Dirección:</strong> @Model.OrdenCompra.Proveedor.Direccion, @Model.OrdenCompra.Proveedor.Localidad</p>
+        <p style="margin-bottom: 5px;"><strong>Teléfono:</strong> @Model.OrdenCompra.Proveedor.Telefono</p>
+        <p style="margin-bottom: 5px;"><strong>E-mail:</strong> @Model.OrdenCompra.Proveedor.Email</p>
+    </div>
+    <div class="col-sm-6">
+        <!-- Datos de Entrega -->
+        <h5><strong>Datos de Entrega</strong></h5>
+        <p style="margin-bottom: 5px;"><strong>Lugar de Entrega:</strong> Sebastián Vera 383, (5800) Río Cuarto, Córdoba.</p>
+        <p style="margin-bottom: 5px;"><strong>Observaciones:</strong> @Model.OrdenCompra.Observaciones</p>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-12">
+        <!-- Tabla de productos -->
+        <h5><strong>Detalle de Productos</strong></h5>
+        <table class="table table-bordered table-striped" style="width:100%">
+            @*  <table class="table"> *@
+            <thead>
+                <tr class="table-dark text-center">
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th class="text-center">Cantidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var detalle in Model.OrdenCompraDetalle)
+                {
+                    <tr>
+                        <td>@detalle.Producto.Codigo</td>
+                        <td>@detalle.Producto.Nombre</td>
+                        <td class="text-center">@detalle.Cantidad</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

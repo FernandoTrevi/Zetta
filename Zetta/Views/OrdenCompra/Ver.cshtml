@@ -2,209 +2,99 @@
 
 @{
     ViewData["Title"] = "Ver";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = null;
 }
 
-<div class="container">
-    <div class="row mt-2">
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+</head>
 
-        <div class="col-sm-6">
-            <!-- Datos de la empresa Bloques Juarez -->
-            <img src="\imagenes\LogoZETTA.jpeg" alt="Logo de la empresa" class="img-fluid" style="max-width: 80px;">
-            <p>Sebastián Vera 383, Río Cuarto, Córdoba.</p>
-            <p><i class="bi bi-envelope-at"></i> ventas@zettacomputacion.com.ar</p>
-            <p><i class="bi bi-whatsapp"></i> 3585167469</p>
+<body>
+    <div class="container flex-container p-2">
+        @* <div class="row mt-3"> *@
+        <div class="row mt-2 flex-container">
+            @* <div class="col-sm-6" style="float: left; width: 50%;"> *@
+            <div class="col-sm-6" style="width: 400px;">
+                <!-- Datos de la empresa -->
+                <img src="\imagenes\LogoZETTA.jpeg" alt="Logo de la empresa" class="img-fluid" style="max-height: 40px;">
+                <p style="margin-bottom: 1px;">Sebastián Vera 383, (5800) Río Cuarto, Córdoba.</p>
+                <p style="margin-bottom: 1px;"><i class="bi bi-envelope-at"></i> ventas@zettacomputacion.com.ar</p>
+                <p style="margin-bottom: 1px;"><i class="bi bi-whatsapp"></i> 3585167469</p>
+            </div>
+
+            @* <div class="col-sm-6" style="float: left; width: 50%;"> *@
+            <div class="col-sm-6" style="width: 400px;">
+                <!-- Número de OrdenCompra y fecha -->
+                <h5 class="mb-3"><strong>Orden de Compra Nro. # @Model.OrdenCompra.NroOrden</strong></h5>
+                <h5><strong>Fecha: @Model.OrdenCompra.Fecha.ToString("dd/MM/yyyy")</strong></h5>
+            </div>
         </div>
 
-        <div class="col-sm-6 text-right">
-            <!-- Número de OrdenCompra y fecha -->
-            <h4>Orden de Compra Nro. # @Model.OrdenCompra.NroOrden</h4>
-            <p>Fecha: @Model.OrdenCompra.Fecha.ToString("dd/MM/yyyy")</p>
+        @* <div class="row mt-2">
+            <div class="col-sm-6" style="float: left; width: 50%;"> *@
+        <div class="row mt-2 flex-container">
+            <div class="col-sm-6" style="width: 400px;">
+                <!-- Datos del proveedor -->
+                <h5><strong>Datos del Proveedor</strong></h5>
+                <p style="margin-bottom: 1px;"><strong>Nombre:</strong> @Model.OrdenCompra.Proveedor.Razonsocial</p>
+                <p style="margin-bottom: 1px;"><strong>Dirección:</strong> @Model.OrdenCompra.Proveedor.Direccion, @Model.OrdenCompra.Proveedor.Localidad</p>
+                <p style="margin-bottom: 1px;"><strong>Teléfono:</strong> @Model.OrdenCompra.Proveedor.Telefono</p>
+                <p style="margin-bottom: 1px;"><strong>E-mail:</strong> @Model.OrdenCompra.Proveedor.Email</p>
+            </div>
+            @* <div class="col-sm-6" style="float: left; width: 50%;"> *@
+            <div class="col-sm-6" style="width: 400px;">
+                <!-- Datos de Entrega -->
+                <h5><strong>Datos de Entrega</strong></h5>
+                <p style="margin-bottom: 1px;"><strong>Lugar de Entrega:</strong> Sebastián Vera 383, (5800) Río Cuarto, Córdoba.</p>
+                <p style="margin-bottom: 1px;"><strong>Observaciones:</strong> @Model.OrdenCompra.Observaciones</p>
+            </div>
         </div>
-    </div>
 
-
-    <div class="row mt-3">
-        <div class="col-sm-6">
-            <!-- Datos del proveedor -->
-            <h5><b>Datos del Proveedor</b></h5>
-            <p>Nombre: @Model.OrdenCompra.Proveedor.Razonsocial</p>
-            <p>Dirección: @Model.OrdenCompra.Proveedor.Direccion, @Model.OrdenCompra.Proveedor.Localidad</p>
-            <p>Teléfono: @Model.OrdenCompra.Proveedor.Telefono</p>
-            <p>E-mail: @Model.OrdenCompra.Proveedor.Email</p>
-
-        </div>
-        <div class="col-sm-6">
-            <!-- Datos del Entrega -->
-            <h5><b>Datos de Entrega</b></h5>
-            <p>Lugar de Entrega: Sebastián Vera 383, Río Cuarto, Córdoba.</p>
-            <p>Observaciones: @Model.OrdenCompra.Observaciones</p>
-        </div>
-    </div>
-
-    <div class="row mt-3">
-        <div class="col-md-12">
-            <!-- Tabla de productos -->
-            <h5><b>Detalle de Productos</b></h5>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Código</th>
-                        <th>Nombre</th>
-                        <th>Cantidad</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var detalle in Model.OrdenCompraDetalle)
-                    {
-                        <tr>
-                            <td>@detalle.Producto.Codigo</td>
-                            <td>@detalle.Producto.Nombre</td>
-                            <td>@detalle.Cantidad </td>
+        <div class="row mt-3">
+            <div class="col-sm-12" style="width: 800px;">
+                <!-- Tabla de productos -->
+                <h5><strong>Detalle de Productos</strong></h5>
+                <table class="table table-bordered table-striped" style="width:100%">
+                    @*  <table class="table"> *@
+                    <thead>
+                        <tr class="table-dark text-center">
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th class="text-center">Cantidad</th>
                         </tr>
-                    }
-                </tbody>
-
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var detalle in Model.OrdenCompraDetalle)
+                        {
+                            <tr>
+                                <td>@detalle.Producto.Codigo</td>
+                                <td>@detalle.Producto.Nombre</td>
+                                <td class="text-center">@detalle.Cantidad</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-    <div class="row mt-3">
-        <div class="col-md-6 offset-md-6 text-right">
-           
-            <!-- Botones -->
-            <div class="mt-4 d-print-none">
-                <a href="@Url.Action("Index", "OrdenCompra")" class="btn btn-primary">Volver</a>
-                <button class="btn btn-success" onclick="window.print()" data-toggle="tooltip" title="Imprimir ésta Orden de Compra"><i class="bi bi-printer"></i>Imprimir</button>
-                <button class="btn btn-primary" onclick="descargarPDF()" data-toggle="tooltip" title="Descargar PDF de esta Orden de Compra"><i class="bi bi-file-pdf"></i>Descargar PDF</button>
 
+        <div class="row">
+            <div class="col-6 col-sm-6 offset-sm-6 text-right">
+                <!-- Botones -->
+                <div class="mt-4 d-flex justify-content-end">
+                    <a href="@Url.Action("Index", "OrdenCompra")" class="btn btn-secondary d-print-none">Volver</a>
+                    <a asp-controller="OrdenCompra" asp-action="MostrarPDFenPagina" asp-route-id="@Model.OrdenCompra.Id" target="_blank" class="btn btn-primary ms-2 d-print-none">Ver PDF en página</a>
+                    <a asp-controller="OrdenCompra" asp-action="DescargarPDF" asp-route-id="@Model.OrdenCompra.Id" class="btn btn-primary ms-2 d-print-none">Descargar PDF</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
-@section Scripts{
 
-    <script>
-        function descargarPDF() {
-            // Obtener el ID de la orden de compra desde el modelo
-            var ordenCompraId = @Model.OrdenCompra.Id;
+</body>
 
-            // Hacer una solicitud AJAX para descargar el PDF
-            $.ajax({
-                url: '@Url.Action("DescargarPDF", "OrdenCompra")',
-                type: 'GET',
-                data: { id: ordenCompraId },
-                success: function (data) {
-                    // Verificar si se generó el PDF correctamente
-                    if (data.rutaArchivoPDF) {
-                        // Crear un enlace temporal y simular clic para descargar el archivo
-                        var link = document.createElement('a');
-                        link.href = data.rutaArchivoPDF;
-                        link.download = 'OrdenCompra.pdf';
-                        link.click();
+</html>
 
-                        // Mostrar mensaje de éxito con Sweet Alert
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'PDF Descargado',
-                            text: 'El archivo PDF se ha descargado correctamente.',
-                        });
-                    } else if (data.error) {
-                        // Mostrar mensaje de error con Sweet Alert
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error al generar el PDF',
-                            text: 'Hubo un error al generar el PDF. Por favor, inténtalo de nuevo.',
-                        });
-                    }
-                },
-                error: function (error) {
-                    // Mostrar mensaje de error en caso de fallo de la solicitud AJAX
-                    console.error('Error en la solicitud AJAX: ' + error.statusText);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error en la solicitud AJAX',
-                        text: 'Hubo un error en la solicitud AJAX. Por favor, inténtalo de nuevo.',
-                    });
-                }
-            });
-        }
-    </script>
-
-    <style type="text/css" media="print">
-    body {
-        font-size: 12pt;
-    }
-
-    .container {
-        max-width: 100%;
-        margin: 0;
-    }
-
-    .row {
-        margin-bottom: 10px;
-    }
-
-    .col-sm-6 {
-        width: 50%;
-        float: left;
-    }
-
-    .col-sm-4 {
-        width: 33.33%;
-        float: right;
-    }
-
-    .col-md-12 {
-        width: 100%;
-    }
-
-    .text-right {
-        text-align: right;
-    }
-
-    .d-print-none {
-        display: none;
-    }
-
-    header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 2cm;
-        text-align: center;
-    }
-
-    footer {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 2cm;
-        text-align: center;
-    }
-
-    img {
-        max-width: 100%;
-        height: auto;
-        margin-bottom: 10px
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-    }
-
-    th, td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-    }
-
-    th {
-        background-color: #f2f2f2;
-    }
-</style>
-
-}

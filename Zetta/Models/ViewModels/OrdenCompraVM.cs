@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using System.ComponentModel.DataAnnotations;
 
 namespace Zetta.Models.ViewModels
 {
@@ -24,7 +23,6 @@ namespace Zetta.Models.ViewModels
         public string Codigo { get; set; }
         public string Nombre { get; set; }
         public int ProductoId { get; set; }
-
 
     }
 }
