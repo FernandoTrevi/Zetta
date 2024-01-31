@@ -19,7 +19,7 @@
         @* <div class="row mt-3"> *@
         <div class="row mt-2 flex-container">
             @* <div class="col-sm-6" style="float: left; width: 50%;"> *@
-            <div class="col-sm-6" style="width: 400px;">
+            <div class="col-sm-6" style="width: 400px; display: inline-block; vertical-align: top;">
                 <!-- Datos de la empresa -->
                 <img src="\imagenes\LogoZETTA.jpeg" alt="Logo de la empresa" class="img-fluid" style="max-height: 40px;">
                 <p style="margin-bottom: 1px;">Sebastián Vera 383, (5800) Río Cuarto, Córdoba.</p>
@@ -27,18 +27,16 @@
                 <p style="margin-bottom: 1px;"><i class="bi bi-whatsapp"></i> 3585167469</p>
             </div>
 
-            @* <div class="col-sm-6" style="float: left; width: 50%;"> *@
-            <div class="col-sm-6" style="width: 400px;">
+            <div class="col-sm-6" style="width: 400px; display: inline-block; vertical-align: top;">
                 <!-- Número de OrdenCompra y fecha -->
                 <h5 class="mb-3"><strong>Orden de Compra Nro. # @Model.OrdenCompra.NroOrden</strong></h5>
                 <h5><strong>Fecha: @Model.OrdenCompra.Fecha.ToString("dd/MM/yyyy")</strong></h5>
             </div>
         </div>
 
-        @* <div class="row mt-2">
-            <div class="col-sm-6" style="float: left; width: 50%;"> *@
+    
         <div class="row mt-2 flex-container">
-            <div class="col-sm-6" style="width: 400px;">
+            <div class="col-sm-6" style="width: 400px; display: inline-block; vertical-align: top;">
                 <!-- Datos del proveedor -->
                 <h5><strong>Datos del Proveedor</strong></h5>
                 <p style="margin-bottom: 1px;"><strong>Nombre:</strong> @Model.OrdenCompra.Proveedor.Razonsocial</p>
@@ -46,8 +44,7 @@
                 <p style="margin-bottom: 1px;"><strong>Teléfono:</strong> @Model.OrdenCompra.Proveedor.Telefono</p>
                 <p style="margin-bottom: 1px;"><strong>E-mail:</strong> @Model.OrdenCompra.Proveedor.Email</p>
             </div>
-            @* <div class="col-sm-6" style="float: left; width: 50%;"> *@
-            <div class="col-sm-6" style="width: 400px;">
+            <div class="col-sm-6" style="width: 400px; display: inline-block; vertical-align: top;">
                 <!-- Datos de Entrega -->
                 <h5><strong>Datos de Entrega</strong></h5>
                 <p style="margin-bottom: 1px;"><strong>Lugar de Entrega:</strong> Sebastián Vera 383, (5800) Río Cuarto, Córdoba.</p>

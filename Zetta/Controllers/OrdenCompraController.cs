@@ -454,9 +454,20 @@ namespace Zetta.Controllers
                 }
 
             };
+            // Obtener el número de orden de compra
+            var ordenCompra = _context.OrdenCompra
+                   .Include(o => o.Proveedor)
+                   .FirstOrDefault(o => o.Id == id); if (ordenCompra == null)
+            {
+                // Manejar el caso en el que no se encuentra la orden de compra
+                return NotFound();
+            }
+
+            // Crear un nombre de archivo con el número de orden y el nombre del proveedor
+            string nombreProveedor = ordenCompra.Proveedor != null ? ordenCompra.Proveedor.Razonsocial : "ProveedorDesconocido";
+            string nombrePDF = $"orden_compra_N°{ordenCompra.NroOrden}_{nombreProveedor}.pdf";
 
             var archivoPDF = _converter.Convert(pdf);
-            string nombrePDF = "reporte_" + DateTime.Now.ToString("ddMMyyyyHHmmss") + ".pdf";
 
             return File(archivoPDF, "application/pdf", nombrePDF);
         }
