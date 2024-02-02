@@ -15,9 +15,9 @@
 </head>
 
 <body>
-    <div class="container flex-container p-2">
+    <div class="container">
         @* <div class="row mt-3"> *@
-        <div class="row mt-2 flex-container">
+        <div class="row mt-2">
             @* <div class="col-sm-6" style="float: left; width: 50%;"> *@
             <div class="col-sm-6" style="width: 400px; display: inline-block; vertical-align: top;">
                 <!-- Datos de la empresa -->
@@ -35,7 +35,7 @@
         </div>
 
     
-        <div class="row mt-2 flex-container">
+        <div class="row mt-2 flex-container ">
             <div class="col-sm-6" style="width: 400px; display: inline-block; vertical-align: top;">
                 <!-- Datos del proveedor -->
                 <h5><strong>Datos del Proveedor</strong></h5>
@@ -80,12 +80,12 @@
         </div>
 
         <div class="row">
-            <div class="col-6 col-sm-6 offset-sm-6 text-right">
+            <div class="col-6 text-right">
                 <!-- Botones -->
-                <div class="mt-4 d-flex justify-content-end">
-                    <a href="@Url.Action("Index", "OrdenCompra")" class="btn btn-secondary d-print-none">Volver</a>
-                    <a asp-controller="OrdenCompra" asp-action="MostrarPDFenPagina" asp-route-id="@Model.OrdenCompra.Id" target="_blank" class="btn btn-primary ms-2 d-print-none">Ver PDF en página</a>
-                    <a asp-controller="OrdenCompra" asp-action="DescargarPDF" asp-route-id="@Model.OrdenCompra.Id" class="btn btn-primary ms-2 d-print-none">Descargar PDF</a>
+                <div class="mt-4 d-flex justify-content-end d-print-none">
+                    <a href="@Url.Action("Index", "OrdenCompra")" class="btn btn-secondary">Volver</a>
+                    <a asp-controller="OrdenCompra" asp-action="MostrarPDFenPagina" asp-route-id="@Model.OrdenCompra.Id" target="_blank" class="btn btn-primary ms-2">Ver PDF en página</a>
+                    <a asp-controller="OrdenCompra" asp-action="DescargarPDF" asp-route-id="@Model.OrdenCompra.Id" class="btn btn-primary ms-2">Descargar PDF</a>
                 </div>
             </div>
         </div>
