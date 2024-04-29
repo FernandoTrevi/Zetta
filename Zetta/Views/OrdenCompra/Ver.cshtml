@@ -86,6 +86,8 @@
                     <a href="@Url.Action("Index", "OrdenCompra")" class="btn btn-secondary">Volver</a>
                     <a asp-controller="OrdenCompra" asp-action="MostrarPDFenPagina" asp-route-id="@Model.OrdenCompra.Id" target="_blank" class="btn btn-primary ms-2">Ver PDF en página</a>
                     <a asp-controller="OrdenCompra" asp-action="DescargarPDF" asp-route-id="@Model.OrdenCompra.Id" class="btn btn-primary ms-2">Descargar PDF</a>
+                    <a asp-controller="OrdenCompra" asp-action="EnviarPDFPorCorreo" asp-route-id="@Model.OrdenCompra.Id" asp-route-nombreProveedor="@Model.OrdenCompra.Proveedor.Razonsocial" asp-route-emailProveedor="@Model.OrdenCompra.Proveedor.Email" class="btn btn-primary ms-2">Enviar PDF por Correo</a>
+
                 </div>
             </div>
         </div>

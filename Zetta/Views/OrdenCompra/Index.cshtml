@@ -1,4 +1,7 @@
-﻿@model IEnumerable<Zetta.Models.OrdenCompra>
+﻿@using Zetta.Datos;
+
+
+@model Paginacion<Zetta.Models.OrdenCompra>
 
 @{
     ViewData["Title"] = "Index";
@@ -27,43 +30,80 @@
 
     <hr />
     <br />
-
-    <table class="table table-bordered table-striped table-hover">
-        <thead>
-            <tr class="table-dark text-center">
-                <th>N°Orden</th>
-                <th>Fecha</th>
-                <th>Proveedor</th>
-                <th>Observaciones</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            @foreach (var ordenCompra in Model)
-            {
-                <tr>
-                    <td>@ordenCompra.NroOrden</td>
-                    <td>@ordenCompra.Fecha.ToShortDateString()</td>
-                    <td>@ordenCompra.Proveedor.Razonsocial</td>
-                    <td>@ordenCompra.Observaciones</td>
-                    <td>@ordenCompra.Estado</td>
-                    <td class="text-center">
-                        <div class="w-75 btn-group" role="group">
-                            <a asp-action="Editar" asp-route-id="@ordenCompra.Id" class="btn btn-primary mx-2">
-                                <i class="bi bi-pencil-square"></i>
-                            </a>
-                            <a asp-action="Ver" asp-route-id="@ordenCompra.Id" class="btn btn-primary mx-2">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                            <a asp-action="Eliminar" asp-route-id="@ordenCompra.Id" class="btn btn-danger mx-2">
-                                <i class="bi bi-trash"></i>
-                            </a>
-                        </div>
-                    </td>
+    @if (Model.Count() > 0)
+    {
+        <table class="table table-bordered table-striped table-hover">
+            <thead>
+                <tr class="table-dark text-center">
+                    <th>N°Orden</th>
+                    <th>Fecha</th>
+                    <th>Proveedor</th>
+                    <th>Observaciones</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+
+            <tbody>
+                @foreach (var ordenCompra in Model)
+                {
+                    <tr>
+                        <td>@ordenCompra.NroOrden</td>
+                        <td>@ordenCompra.Fecha.ToShortDateString()</td>
+                        <td>@ordenCompra.Proveedor.Razonsocial</td>
+                        <td>@ordenCompra.Observaciones</td>
+                        <td>@ordenCompra.Estado</td>
+                        <td class="text-center">
+                            <div class="w-75 btn-group" role="group">
+                                @{
+                                    bool disableEdit = ordenCompra.Estado != EstadoOrden.Pendiente;
+                                }
+                                <a asp-action="Editar" asp-route-id="@ordenCompra.Id" class="btn btn-primary mx-2 @(disableEdit ? "disabled" : "")">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a asp-action="Ver" asp-route-id="@ordenCompra.Id" class="btn btn-primary mx-2">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Eliminar" asp-route-id="@ordenCompra.Id" class="btn btn-danger mx-2">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <nav>
+            <ul class="pagination justify-content-center">
+                @if (Model.PaginasAnteriores)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Index", new { numpag = Model.PaginaInicio - 1, filtroActual = ViewData["FiltroActual"] })">Anterior</a>
+                    </li>
+                }
+
+                @for (int i = 1; i <= Model.PaginasTotales; i++)
+                {
+                    <li class="page-item @(i == Model.PaginaInicio ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Index", new { numpag = i, filtroActual = ViewData["FiltroActual"] })">@i</a>
+                    </li>
+                }
+
+                @if (Model.PaginasPosteriores)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Index", new { numpag = Model.PaginaInicio + 1, filtroActual = ViewData["FiltroActual"] })">Siguiente</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+    else
+    {
+        <p>No hay registros de Categoria</p>
+    }
+
+    
+
+   
 </div>

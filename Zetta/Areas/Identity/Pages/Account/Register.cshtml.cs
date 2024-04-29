@@ -140,6 +140,8 @@ namespace Zetta.Areas.Identity.Pages.Account
 
                 if (result.Succeeded)//si el usuario se creó exitosamente
                 {
+                    //await _userManager.AddToRoleAsync(user, WC.AdminRole);
+
                     if (User.IsInRole(WC.AdminRole))
                     {
                         await _userManager.AddToRoleAsync(user, WC.AdminRole);

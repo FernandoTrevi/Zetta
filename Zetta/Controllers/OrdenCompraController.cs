@@ -4,10 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Zetta.Datos;
 using Zetta.Models;
 using Zetta.Models.ViewModels;
-
+using Zetta.Utilidades;
 using DinkToPdf;
 using DinkToPdf.Contracts;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using System.Text;
 
 namespace Zetta.Controllers
 {
@@ -15,11 +17,15 @@ namespace Zetta.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IConverter _converter;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IEmailSender _emailSender;
 
-        public OrdenCompraController(ApplicationDbContext context, IConverter converter)
+        public OrdenCompraController(ApplicationDbContext context, IConverter converter, IWebHostEnvironment webHostEnvironment, IEmailSender emailSender)
         {
             _context = context;
             _converter = converter;
+            _emailSender = emailSender;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: OrdenCompra/Index
@@ -148,8 +154,11 @@ namespace Zetta.Controllers
 
                     // 5. Guardar los cambios en la base de datos
                     await _context.SaveChangesAsync();
+                    TempData["success"] = "Orden de compra creada exitosamente!";
 
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction("Ver", new { id = IdDeOrdenCompra });
+
+                    //return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
@@ -260,6 +269,7 @@ namespace Zetta.Controllers
             {
                 return NotFound();
             }
+           
             // Crear un objeto OrdenCompraVM y asignar la orden recuperada
             OrdenCompraVM ordenCompraVM = new()
             {
@@ -279,6 +289,7 @@ namespace Zetta.Controllers
                     }),
                 ProductoIdSel = id
             };
+
             return View(ordenCompraVM);
         }
 
@@ -368,6 +379,57 @@ namespace Zetta.Controllers
         }
 
         // Otras acciones del controlador...
+        public async Task<IActionResult> EnviarPDFPorCorreo(int id, string nombreProveedor, string emailProveedor)
+        {
+            // URL de la página web desde la que quieres leer el contenido
+            string url = $"https://localhost:7259/OrdenCompra/Ver/{id}";
+
+            // Crear cliente HttpClient
+            using ( HttpClient client = new HttpClient())
+            {
+                try
+                {
+                    // Realizar la solicitud GET a la URL
+                    HttpResponseMessage response = await client.GetAsync(url);
+
+                    // Verificar si la solicitud fue exitosa
+                    if (response.IsSuccessStatusCode)
+                    {
+                        // Leer el contenido de la página web
+                        string webContent = await response.Content.ReadAsStringAsync();
+
+                        // Actualizar el estado de la orden de compra a "Enviada"
+                        var ordenCompra = await _context.OrdenCompra.FirstOrDefaultAsync(o => o.Id == id);
+                        if (ordenCompra != null)
+                        {
+                            ordenCompra.Estado = EstadoOrden.Enviada;
+                            await _context.SaveChangesAsync();
+                        }
+                        // Crear el mensaje de correo electrónico con el contenido de la página web
+                        await _emailSender.SendEmailAsync(emailProveedor, "Nueva orden", webContent);
+                        TempData["success"] = "Orden de compra enviada exitosamente!";
+
+                    }
+                    else
+                    {
+                        // Manejar el caso donde la solicitud no fue exitosa
+                        // Esto podría ser una redirección, un error del servidor, etc.
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Manejar cualquier excepción que ocurra durante el proceso
+                    // Esto podría ser un error de red, una excepción de lectura/escritura, etc.
+                    Console.WriteLine("Error: " + ex.Message);
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+
+            // Redireccionar a la página de índice u otra acción apropiada
+            return RedirectToAction(nameof(Index));
+        }
+
 
         public int? ObtenerProductoIdPorCodigo(string codigo)
         {

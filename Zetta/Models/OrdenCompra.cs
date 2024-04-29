@@ -8,7 +8,7 @@ namespace Zetta.Models
         [Key]
         public int Id { get; set; }
 
-        public int NroOrden { get; set; } // Se autoincrementará en la base de datos
+        public int NroOrden { get; set; } 
         public DateTime Fecha { get; set; }
 
         // Relación con el proveedor
@@ -30,6 +30,7 @@ namespace Zetta.Models
     public enum EstadoOrden
     {
         Pendiente,
+        Enviada,
         Procesada
     }
 }
