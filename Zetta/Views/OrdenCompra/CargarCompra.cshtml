@@ -1,0 +1,214 @@
+﻿@model Zetta.Models.ViewModels.CompraVM
+
+@{
+    ViewData["Title"] = "Cargar Factura de Compra";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="border p-3">
+    <div class="form-group row">
+        <h2 class="text-info">Cargar Factura de Compra</h2>
+    </div>
+    <hr />
+
+    <form asp-controller="OrdenCompra" asp-action="CargarCompra" method="post">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label asp-for="ProveedorId" class="form-label">Proveedor</label>
+                    <select id="ProveedorId" asp-for="ProveedorId" asp-items="@Model.ProveedorLista" class="form-select">
+                        <option disabled selected>--Seleccione un Proveedor--</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label asp-for="FechaFactura" class="form-label">Fecha</label>
+                    <input type="date" class="form-control" asp-for="FechaFactura" />
+                    <span asp-validation-for="FechaFactura" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label asp-for="NumeroFactura" class="form-label">Número de Factura</label>
+                    <input type="text" class="form-control" asp-for="NumeroFactura" />
+                    <span asp-validation-for="NumeroFactura" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <br />
+
+        <!-- La tabla de órdenes de compra está inicializada vacía -->
+        <div class="row">
+            <div class="col-md-12">
+                <h3 class="text-info">Ordenes de Compra asociadas a:  <span id="nombreProveedor"></span></h3>
+                <table id="ordenesCompra" class="table">
+                    <thead>
+                        <tr>
+                            <th></th> <!-- Checkbox -->
+                            <th>Nro de Orden</th>
+                            <th>Fecha</th>
+                            <th>Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <hr />
+        <!-- Botón para seleccionar las órdenes de compra -->
+        <div class="row">
+            <div class="col-md-3">
+                <button type="button" id="seleccionarOrdenesBtn" class="btn btn-primary form-control">Seleccionar</button>
+            </div>
+        </div>
+        <br />
+
+        <!-- Sección de Productos de la Factura -->
+        <h3 class="text-info">Productos de la Factura</h3>
+        <hr />
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table" id="productosFactura">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Descripción</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Aquí se mostrarán los productos de la factura -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br />
+
+        <div class="row">
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary form-control">Confirmar Factura</button>
+            </div>
+            <div class="col-md-3">
+                <a asp-controller="FacturaCompra" asp-action="Index" class="btn btn-secondary form-control">Cancelar</a>
+            </div>
+        </div>
+        <br />
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Al cargar la página, la tabla de órdenes de compra está vacía
+            $('#ordenesCompra tbody').empty();
+
+            // Al cambiar la selección de proveedor
+            $('#ProveedorId').change(function () {
+                // Obtener el ID del proveedor seleccionado
+                var proveedorId = $(this).val();
+                // Limpiar la tabla de órdenes de compra
+                $('#ordenesCompra tbody').empty();
+                // Mostrar las órdenes de compra del proveedor seleccionado
+                mostrarOrdenesCompra(proveedorId);
+            });
+        });
+
+        function mostrarOrdenesCompra(proveedorId) {
+            // Verificar si se proporciona un ID de proveedor
+            if (proveedorId) {
+                $.ajax({
+                    url: '/OrdenCompra/ObtenerOrdenesCompra?proveedorId=' + proveedorId,
+                    type: 'GET',
+                    success: function (ordenes) {
+
+                        // Mostrar el nombre del proveedor
+                        $('#nombreProveedor').text($('option:selected', '#ProveedorId').text());
+
+                        // Verificar si se recibieron órdenes de compra
+                        if (ordenes && ordenes.length > 0) {
+                            // Agregar las órdenes de compra a la tabla
+                            $.each(ordenes, function (index, orden) {
+                                var row = $('<tr>');
+                                row.append($('<td>').html('<input type="checkbox" class="orden-checkbox" data-id="' + orden.id + '" />'));
+                                row.append($('<td>').text(orden.nroOrden));
+                                row.append($('<td>').text(orden.fecha));
+                                row.append($('<td>').text(orden.observaciones));
+                                $('#ordenesCompra tbody').append(row);
+                            });
+                        } else {
+                            // Si no se reciben órdenes de compra, mostrar un mensaje
+                            $('#ordenesCompra tbody').append('<tr><td colspan="4">No se encontraron órdenes de compra para este proveedor.</td></tr>');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // Manejar errores de la solicitud AJAX
+                        console.error(xhr.responseText);
+                    }
+                });
+            }
+        }
+        $(document).ready(function () {
+            $('#seleccionarOrdenesBtn').click(function () {
+                // Limpiar la tabla de Productos de la Factura antes de agregar nuevos detalles
+                $('#productosFactura tbody').empty();
+
+                // Array para almacenar los IDs de las órdenes de compra seleccionadas
+                var ordenesSeleccionadas = [];
+                // Recorrer todos los checkboxes marcados en la tabla de órdenes de compra
+                $('#ordenesCompra tbody tr .orden-checkbox:checked').each(function () {
+                    // Obtener el ID de la orden de compra desde el atributo data
+                    var ordenId = $(this).data('id');
+                    console.log("Id seleccionados:", ordenId);
+                    ordenesSeleccionadas.push(ordenId);
+                });
+                console.log("IDs de órdenes seleccionadas:", ordenesSeleccionadas);
+
+               
+
+                // Realizar la solicitud AJAX al controlador para obtener los detalles de las órdenes de compra seleccionadas
+                $.ajax({
+                    url: '/OrdenCompra/ObtenerDetallesOrdenCompra?ordenIds=' + ordenesSeleccionadas,
+                    type: 'GET',
+                    success: function (detalles) {
+                        console.log(detalles); // Imprime los detalles en la consola
+
+                        // Verificar si se recibieron detalles de la orden de compra
+                        // if (detalles && detalles.length > 0) {
+                            // Agregar los detalles de la orden de compra a la tabla de Productos de la Factura
+                        $.each(detalles.$values, function (index, detalle) {
+                            var row = $('<tr>');
+                                row.append($('<td>').text(detalle.Codigo));
+                                row.append($('<td>').text(detalle.Nombre));
+                                row.append($('<td>').text(detalle.Cantidad));
+                                // Agregar más columnas según sea necesario
+                                $('#productosFactura tbody').append(row);
+                            });
+                        // } else {
+                        //     // Si no se reciben detalles de la orden de compra, mostrar un mensaje
+                        //     $('#productosFactura tbody').append('<tr><td colspan="3">No se encontraron detalles para esta orden de compra.</td></tr>');
+                        // }
+                    },
+                    error: function (xhr, status, error) {
+                        // Manejar errores de la solicitud AJAX
+                        console.error(xhr.responseText);
+                    }
+
+                });
+
+            });
+        });
+s
+
+    </script>
+}
+
+
+
+
+
+
+
+
+

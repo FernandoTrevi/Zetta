@@ -18,5 +18,7 @@ namespace Zetta.Models
         public DateTime Fecha { get; set; }
 
         public string Concepto { get; set; }
+
+        public string? NroComprobante { get; set; }
     }
 }

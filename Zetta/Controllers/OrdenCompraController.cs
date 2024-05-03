@@ -10,6 +10,8 @@ using DinkToPdf.Contracts;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using System.Text;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace Zetta.Controllers
 {
@@ -378,7 +380,100 @@ namespace Zetta.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public IActionResult CargarCompra()
+        {
+            // Obtener la lista de proveedores desde la base de datos
+            var proveedores = _context.Proveedor.Select(proveedor =>
+                new SelectListItem
+                {
+                    Value = proveedor.Id.ToString(),
+                    Text = proveedor.Razonsocial
+                }).ToList();
+
+            // Obtener todas las órdenes de compra desde la base de datos
+            var ordenesCompra = _context.OrdenCompra
+                        .Include(orden => orden.OrdenCompraDetalle) // Cargar los detalles de la orden de compra
+                        .ToList();
+
+            // Crear el ViewModel con la lista de proveedores y todas las órdenes de compra
+            var viewModel = new CompraVM
+            {
+                FechaFactura = DateTime.Today,
+                ProveedorLista = proveedores,
+                OrdenCompra = ordenesCompra
+            };
+
+            return View(viewModel);
+        }
+
+
         // Otras acciones del controlador...
+
+        [HttpGet]
+        public IActionResult ObtenerDetallesOrdenCompra(string ordenIds)
+        {
+            try
+            {
+                List<int> ids = ordenIds.Split(',').Select(int.Parse).ToList();
+
+                // Lista para almacenar los detalles de las órdenes de compra
+                List<OrdenCompraDetalle> detalles = new List<OrdenCompraDetalle>();
+
+                // Iterar sobre cada ID de orden de compra recibido
+                foreach (int orderId in ids)
+                {
+                    // Buscar la orden de compra en la base de datos
+                    var ordenCompra = _context.OrdenCompra
+                        .Include(o => o.OrdenCompraDetalle) // Cargar los detalles de la orden de compra
+                        .FirstOrDefault(o => o.Id == orderId);
+
+                    if (ordenCompra != null)
+                    {
+                        // Agregar los detalles de la orden de compra a la lista
+                        detalles.AddRange(ordenCompra.OrdenCompraDetalle);
+                    }
+                }
+
+                // Devolver los detalles de las órdenes de compra en formato JSON
+                return Json(detalles, new JsonSerializerOptions
+                {
+                    ReferenceHandler = ReferenceHandler.Preserve
+                });
+            }
+            catch (Exception ex)
+            {
+                // Manejar cualquier error y devolver un código de estado apropiado
+                return StatusCode(500, $"Error al obtener los detalles de las órdenes de compra: {ex.Message}");
+            }
+        }
+
+
+
+        [HttpGet]
+        public IActionResult ObtenerOrdenesCompra(int proveedorId)
+        {
+            try
+            {
+                // Obtener las órdenes de compra del proveedor especificado
+                var ordenesCompra = _context.OrdenCompra
+                    .Where(o => o.ProveedorId == proveedorId && o.Estado == EstadoOrden.Enviada)
+                    .ToList();
+
+                // Devolver las órdenes de compra en formato JSON
+                return Json(ordenesCompra);
+            }
+            catch (Exception ex)
+            {
+                // Manejar cualquier error y devolver un código de estado apropiado
+                return StatusCode(500, $"Error al obtener las órdenes de compra: {ex.Message}");
+            }
+        }
+
+
+
+
+
+
         public async Task<IActionResult> EnviarPDFPorCorreo(int id, string nombreProveedor, string emailProveedor)
         {
             // URL de la página web desde la que quieres leer el contenido
