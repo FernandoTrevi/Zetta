@@ -30,8 +30,8 @@ namespace Zetta.Models
         public int Cantidad { get; set; }
 
         [Required]
-        public decimal PrecioUnitario { get; set; } 
+        public decimal Precio { get; set; } 
 
-        public decimal Total => Cantidad * PrecioUnitario; // Propiedad calculada para el total
+        public decimal Total => Cantidad * Precio; // Propiedad calculada para el total
     }
 }

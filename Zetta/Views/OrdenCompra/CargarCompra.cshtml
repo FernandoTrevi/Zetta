@@ -11,6 +11,7 @@
     <hr />
 
     <form asp-controller="OrdenCompra" asp-action="CargarCompra" method="post">
+
         <div class="row">
             <div class="col-md-4">
                 <div class="form-group">
@@ -74,7 +75,7 @@
                             <th>Código</th>
                             <th>Descripción</th>
                             <th>Cantidad</th>
-                            <th>Precio</th>
+                            <th class="text-center">Precio</th>
                             <th>Subtotal</th>
                         </tr>
                     </thead>
@@ -91,7 +92,7 @@
                 <button type="submit" class="btn btn-primary form-control">Confirmar Factura</button>
             </div>
             <div class="col-md-3">
-                <a asp-controller="FacturaCompra" asp-action="Index" class="btn btn-secondary form-control">Cancelar</a>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-secondary form-control">Cancelar</a>
             </div>
         </div>
         <br />
@@ -99,6 +100,9 @@
 </div>
 
 @section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
     <script>
         $(document).ready(function () {
             // Al cargar la página, la tabla de órdenes de compra está vacía
@@ -165,26 +169,111 @@
                 });
                 console.log("IDs de órdenes seleccionadas:", ordenesSeleccionadas);
 
-               
 
                 // Realizar la solicitud AJAX al controlador para obtener los detalles de las órdenes de compra seleccionadas
                 $.ajax({
-                    url: '/OrdenCompra/ObtenerDetallesOrdenCompra?ordenIds=' + ordenesSeleccionadas,
+                    url: '/OrdenCompra/ObtenerDetallesOrdenCompra',
                     type: 'GET',
+                    data: { ordenIds: ordenesSeleccionadas },
+                    traditional: true, // Para que jQuery convierta el array en una cadena correctamente
                     success: function (detalles) {
                         console.log(detalles); // Imprime los detalles en la consola
 
                         // Verificar si se recibieron detalles de la orden de compra
                         // if (detalles && detalles.length > 0) {
-                            // Agregar los detalles de la orden de compra a la tabla de Productos de la Factura
-                        $.each(detalles.$values, function (index, detalle) {
-                            var row = $('<tr>');
-                                row.append($('<td>').text(detalle.Codigo));
-                                row.append($('<td>').text(detalle.Nombre));
-                                row.append($('<td>').text(detalle.Cantidad));
-                                // Agregar más columnas según sea necesario
-                                $('#productosFactura tbody').append(row);
+                        // Limpiar la tabla antes de agregar nuevas filas
+                        $('#productosFactura tbody').empty();
+
+                        // Recorrer cada detalle de la orden de compra
+                        detalles.forEach(function (detalle, index) {
+                            // Crear una nueva fila
+                            var fila = $('<tr></tr>');
+                            // Agregar las celdas con los datos del detalle
+                            fila.append('<td>' + detalle.codigo + '</td>'); // Código
+                            fila.append('<td>' + detalle.nombre + '</td>'); // Descripción
+                            fila.append('<td>' + detalle.cantidad + '</td>'); // Cantidad
+                            // Crear un campo de entrada editable para el precio
+                            // Crear un campo de entrada editable para el precio
+                            var precioInput = $('<input>', {
+                                type: 'number',
+                                value: detalle.precio,
+                                step: '0.01', // para permitir decimales
+                                min: '0', // valor mínimo
+                                class: 'editable-precio form-control text-right' 
                             });
+                            fila.append($('<td></td>').append(precioInput));
+                            // Crear un elemento para mostrar el subtotal
+                            var subtotalElement = $('<td class="text-right"></td>');
+                            fila.append(subtotalElement); // Subtotal
+
+                            // Función para calcular y actualizar el subtotal
+                            function actualizarSubtotal() {
+                                var nuevoPrecio = parseFloat(precioInput.val());
+                                var subtotal = detalle.cantidad * nuevoPrecio;
+                                subtotalElement.text('$' + subtotal.toFixed(2));
+                            }
+
+                            // Escuchar el evento de cambio en el campo de entrada de precio
+                            precioInput.on('change', actualizarSubtotal);
+
+                            // Agregar el campo de entrada de precio a la fila
+                            //fila.append($('<td></td>').append(precioInput));
+
+                            // Calcular y mostrar el subtotal inicial
+                            actualizarSubtotal();
+                            
+                            // Crear inputs para cada propiedad del detalle
+                            var productoIdInput = $('<input>', {
+                                type: 'hidden',
+                                name: 'DetallesFactura[' + index + '].ProductoId',
+                                value: detalle.productoId
+                            });
+                            var codigoInput = $('<input>', {
+                                type: 'hidden',
+                                name: 'DetallesFactura[' + index + '].Codigo',
+                                value: detalle.codigo
+                            });
+                            var nombreInput = $('<input>', {
+                                type: 'hidden',
+                                name: 'DetallesFactura[' + index + '].Nombre',
+                                value: detalle.nombre
+                            });
+                            var cantidadInput = $('<input>', {
+                                type: 'hidden',
+                                name: 'DetallesFactura[' + index + '].Cantidad',
+                                value: detalle.cantidad
+                            });
+                            var precioHiddenInput = $('<input>', {
+                                type: 'hidden',
+                                name: 'DetallesFactura[' + index + '].Precio',
+                                value: detalle.precio
+                            });
+                            var totalInput = $('<input>', {
+                                type: 'hidden',
+                                name: 'DetallesFactura[' + index + '].Total',
+                                value: detalle.total
+                            });
+                            var ordenCompraIdInput = $('<input>', {
+                                type: 'hidden',
+                                name: 'DetallesFactura[' + index + '].OrdenCompraId',
+                                value: detalle.ordenCompraId
+                            });
+
+                            // Agregar los inputs ocultos a la fila
+                            fila.append(productoIdInput);
+                            fila.append(codigoInput);
+                            fila.append(nombreInput);
+                            fila.append(cantidadInput);
+                            fila.append(precioHiddenInput);
+                            fila.append(totalInput);
+                            fila.append(ordenCompraIdInput);
+                          
+                            // Agregar la fila a la tabla
+                            $('#productosFactura tbody').append(fila);
+                           
+
+                        });
+
                         // } else {
                         //     // Si no se reciben detalles de la orden de compra, mostrar un mensaje
                         //     $('#productosFactura tbody').append('<tr><td colspan="3">No se encontraron detalles para esta orden de compra.</td></tr>');
@@ -196,12 +285,20 @@
                     }
 
                 });
+              
 
             });
         });
-s
+
 
     </script>
+    <style>
+        .text-right {
+            text-align: right;
+        }
+
+    </style>
+
 }
 
 

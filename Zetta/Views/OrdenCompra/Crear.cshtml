@@ -50,13 +50,13 @@
             <div class="col-md-3">
                 <label asp-for="ProductoCodigo" class="form-label">Código</label>
                 <select asp-for="ProductoCodigo" id="ProductoCodigo" asp-items="@Model.ProductoCodigoLista" class="form-select">
-                    <option disabled selected>--Seleccione un Código</option>
+                    <option value="" disabled selected>--Seleccione un Código</option>
                 </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label asp-for="ProductoNombre" class="form-label">Nombre</label>
                 <select asp-for="ProductoNombre" id="ProductoNombre" asp-items="@Model.ProductoNombreLista" class="form-select">
-                    <option disabled selected>--Seleccione un Nombre</option>
+                    <option value="" disabled selected>--Seleccione un Nombre</option>
                 </select>
             </div>
 
@@ -65,11 +65,18 @@
                 <input asp-for="ProductoCantidad" id="ProductoCantidad" class="form-control" />
                 <span asp-validation-for="ProductoCantidad" class="text-danger"></span>
             </div>
+            <div class="col-md-2">
+                <label asp-for="ProductoPrecio" class="form-label">Precio</label>
+                <input asp-for="ProductoPrecio" id="ProductoPrecio" class="form-control" type="number" step="0.1" />
+                <span asp-validation-for="ProductoPrecio" class="text-danger"></span>
+            </div>
 
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <button type="button" id="agregarProducto" onclick="AgregarDetalle()" class="btn btn-info form-control">Agregar Producto</button>
             </div>
         </div>
+
+
         <br />
         <div id="detalles">
             <table id="tablaDetalle" class="table table-bordered table-striped table-hover">
@@ -79,6 +86,7 @@
                         <th>Código</th>
                         <th>Nombre</th>
                         <th>Cantidad</th>
+                        <th>Precio Unitario</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -115,9 +123,12 @@
             <h2 id="nombreProducto"></h2> <!-- Mostrará el nombre del producto -->
             <label for="nuevaCantidad">Nueva Cantidad:</label>
             <input type="number" id="nuevaCantidad">
+            <label for="nuevoPrecio">Nuevo Precio:</label>
+            <input type="number" step="0.1" id="nuevoPrecio">
             <button onclick="GuardarEdicion()">Guardar</button>
         </div>
     </div>
+
 
 </div>
 
@@ -134,8 +145,10 @@
             let Codigo = document.getElementById("ProductoCodigo").value;
             let Nombre = document.getElementById("ProductoNombre").value;
             let Cantidad = document.getElementById("ProductoCantidad").value;
+            let Precio = document.getElementById("ProductoPrecio").value;
 
-            if (Codigo && Nombre && Cantidad && !isNaN(Cantidad) && Cantidad > 0) {
+            if (Codigo && Nombre && Cantidad && Precio && !isNaN(Cantidad) && Cantidad > 0
+                                                       && !isNaN(Precio) && Precio > 0) {
                 // Verificar si el producto ya existe en la lista de detalles
                 var existeProducto = detalles.some(function (detalle) {
                     return detalle.Codigo === Codigo && detalle.Nombre === Nombre;
@@ -154,6 +167,8 @@
                     let TDNombre = document.createElement("td");
                     let TDCantidad = document.createElement("td");
                     TDCantidad.style.textAlign = "right";
+                    let TDPrecio = document.createElement("td");
+                    TDPrecio.style.textAlign = "right";
                     let TDAcciones = document.createElement("td");
                     TDAcciones.style.textAlign = "center";
                     let botonEditar = document.createElement("button");
@@ -164,7 +179,7 @@
                     botonEditar.type = "button";
                     botonEditar.onclick = function () {
                         // Llama a la función para abrir el modal de edición
-                        AbrirModalEdicion(Codigo);
+                        AbrirModalEdicion(Codigo, Nombre, Cantidad, Precio);
                     };
 
                     botonEliminar.textContent = "Eliminar";
@@ -172,7 +187,6 @@
                     botonEliminar.type = "button";
                     botonEliminar.id = "eliminar_" + Codigo;
                     botonEliminar.onclick = function () {
-                        // Aquí debes llamar a la función EliminarProducto sin los paréntesis
                         EliminarProducto(this.id);
                     };
 
@@ -182,17 +196,22 @@
                     TR.appendChild(TDCodigo);
                     TR.appendChild(TDNombre);
                     TR.appendChild(TDCantidad);
+                    TR.appendChild(TDPrecio);
                     TR.appendChild(TDAcciones);
 
                     Tabla.appendChild(TR);
                     TDCodigo.innerHTML = Codigo;
                     TDNombre.innerHTML = Nombre;
                     TDCantidad.innerHTML = Cantidad;
+                    TDPrecio.innerHTML = Precio;
+
 
                     let divDetalles = document.getElementById("detalles");
                     let HiddenCodigo = document.createElement("input");
                     let HiddenNombre = document.createElement("input");
                     let HiddenCantidad = document.createElement("input");
+                    let HiddenPrecio = document.createElement("input");
+
 
                     // Crear un div para englobar los tres input ocultos
                     let divContenedor = document.createElement("div");
@@ -211,10 +230,18 @@
                     HiddenCantidad.value = Cantidad;
                     HiddenCantidad.type = "hidden";
 
-                    // Agregar los tres input ocultos al div contenedor
+                    Precio = Precio.replace(".", ",");
+                    HiddenPrecio.name = "OrdenCompraDetalle[" + num + "].Precio";
+                    HiddenPrecio.value = Precio;
+                    HiddenPrecio.type = "hidden";
+                    Precio = Precio.replace(",", ".");
+
+
+                    // Agregar los cuatro input ocultos al div contenedor
                     divContenedor.appendChild(HiddenCodigo);
                     divContenedor.appendChild(HiddenNombre);
                     divContenedor.appendChild(HiddenCantidad);
+                    divContenedor.appendChild(HiddenPrecio);
 
                     // Agregar el div contenedor al documento
                     divDetalles.appendChild(divContenedor);
@@ -228,6 +255,7 @@
                     document.getElementById("ProductoCodigo").value = "";
                     document.getElementById("ProductoNombre").value = "";
                     document.getElementById("ProductoCantidad").value = "";
+                    document.getElementById("ProductoPrecio").value = "";
 
                     num++;
                 } else {
@@ -236,10 +264,11 @@
                     document.getElementById("ProductoCodigo").value = "";
                     document.getElementById("ProductoNombre").value = "";
                     document.getElementById("ProductoCantidad").value = "";
+                    document.getElementById("ProductoPrecio").value = "";
                 }
             } else {
                 // Mostrar un mensaje de error si los datos son inválidos
-                alert("Por favor, ingrese un código válido, un nombre válido y una cantidad válida mayor a cero.");
+                alert("Por favor, ingrese un código válido, un nombre válido y una cantidad o precio válida mayor a cero.");
             }
        
 
@@ -322,14 +351,16 @@
             // Si hay productos, el formulario se enviará normalmente
         }
 
-        function AbrirModalEdicion(codigo) {
+        function AbrirModalEdicion(codigo, nombre, cantidad, precio) {
             const detalle = detalles.find(detalle => detalle.Codigo === codigo);
 
             // Pasa el código al modal
-            document.getElementById("nuevaCantidad").value = detalle.Cantidad;
+            document.getElementById("nuevaCantidad").value = cantidad;
+
+            document.getElementById("nuevoPrecio").value = precio;
 
             // Pasa el nombre al modal
-            document.getElementById("nombreProducto").textContent = detalle.Nombre;
+            document.getElementById("nombreProducto").textContent = nombre;
 
             // Pasa el código a una variable global para su uso en la función GuardarEdicion
             ultimoCodigoSeleccionado = codigo;
@@ -346,6 +377,7 @@
         function GuardarEdicion() {
             // Obtén la nueva cantidad del campo en el modal
             const nuevaCantidad = parseInt(document.getElementById("nuevaCantidad").value);
+            const nuevoPrecio = parseFloat(document.getElementById("nuevoPrecio").value);
 
             // Encuentra el detalle en el array detalles por su código
             const detalle = detalles.find(detalle => detalle.Codigo === ultimoCodigoSeleccionado);
@@ -353,11 +385,13 @@
             // Actualiza la cantidad solo para el producto seleccionado
             if (detalle) {
                 detalle.Cantidad = nuevaCantidad;
-
+                detalle.Precio = nuevoPrecio;
                 // Actualiza la cantidad en la fila de la tabla correspondiente
                 const fila = document.getElementById("fila_" + ultimoCodigoSeleccionado);
                 if (fila) {
                     fila.querySelector("td:nth-child(3)").textContent = nuevaCantidad;
+                    fila.querySelector("td:nth-child(4)").textContent = nuevoPrecio;
+
                 }
             }
 
@@ -365,8 +399,7 @@
             CerrarModalEdicion();
         }
 
-
-
+        
     </script>
 
 

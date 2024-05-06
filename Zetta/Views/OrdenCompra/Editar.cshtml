@@ -46,13 +46,13 @@
             <div class="col-md-3">
                 <label asp-for="ProductoCodigo" class="form-label">Código</label>
                 <select asp-for="ProductoCodigo" id="ProductoCodigo" asp-items="@Model.ProductoCodigoLista" class="form-select">
-                    <option disabled selected>--Seleccione un Código</option>
+                    <option value="" disabled selected>--Seleccione un Código</option>
                 </select>
             </div>
             <div class="col-md-4">
                 <label asp-for="ProductoNombre" class="form-label">Nombre</label>
                 <select asp-for="ProductoNombre" id="ProductoNombre" asp-items="@Model.ProductoNombreLista" class="form-select">
-                    <option disabled selected>--Seleccione un Nombre</option>
+                    <option value="" disabled selected>--Seleccione un Nombre</option>
                 </select>
             </div>
 
@@ -61,7 +61,11 @@
                 <input asp-for="ProductoCantidad" id="ProductoCantidad" class="form-control" />
                 <span asp-validation-for="ProductoCantidad" class="text-danger"></span>
             </div>
-
+            <div class="col-md-2">
+                <label asp-for="ProductoPrecio" class="form-label">Precio</label>
+                <input asp-for="ProductoPrecio" id="ProductoPrecio" class="form-control" />
+                <span asp-validation-for="ProductoPrecio" class="text-danger"></span>
+            </div>
             <div class="col-md-3">
                 <button type="button" id="agregarProducto" onclick="AgregarDetalle()" class="btn btn-info form-control">Agregar Producto</button>
             </div>
@@ -75,6 +79,7 @@
                         <th>Código</th>
                         <th>Nombre</th>
                         <th>Cantidad</th>
+                        <th>Precio</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -87,8 +92,9 @@
                             <td>@detalle.Codigo</td>
                             <td>@detalle.Producto.Nombre</td>
                             <td>@detalle.Cantidad</td>
+                            <td>@detalle.Precio</td>
                             <td>
-                                <button type="button" class="btn btn-primary" onclick="AbrirModalEdicion('@detalle.Producto.Codigo', '@detalle.Producto.Nombre', @detalle.Cantidad)">Editar</button>
+                                <button type="button" class="btn btn-primary" onclick="AbrirModalEdicion('@detalle.Producto.Codigo', '@detalle.Producto.Nombre', @detalle.Cantidad ,@detalle.Precio)">Editar</button>
                                 <button type="button" class="btn btn-danger" onclick="EliminarDetalle('@detalle.Producto.Codigo')">Eliminar</button>
                             </td>
 
@@ -124,6 +130,8 @@
             <h2 id="nombreProducto"></h2> <!-- Mostrará el nombre del producto -->
             <label for="nuevaCantidad">Nueva Cantidad:</label>
             <input type="number" id="nuevaCantidad">
+            <label for="nuevoPrecio">Nuevo Precio:</label>
+            <input type="number" step="0.1" id="nuevoPrecio">
             <button onclick="GuardarEdicion()">Guardar</button>
         </div>
     </div>
@@ -139,8 +147,10 @@
             let Codigo = document.getElementById("ProductoCodigo").value;
             let Nombre = document.getElementById("ProductoNombre").value;
             let Cantidad = document.getElementById("ProductoCantidad").value;
+            let Precio = document.getElementById("ProductoPrecio").value;
 
-            if (Codigo && Nombre && Cantidad && !isNaN(Cantidad) && Cantidad > 0) {
+            if (Codigo && Nombre && Cantidad && !isNaN(Cantidad) && Cantidad > 0
+                && Precio && !isNaN(Precio) && Precio > 0) {
                 // Crear una nueva fila en la tabla
                 let Tabla = document.getElementById("tablaDetalle");
                 let TR = Tabla.insertRow();
@@ -148,11 +158,13 @@
                 let TDCodigo = TR.insertCell();
                 let TDNombre = TR.insertCell();
                 let TDCantidad = TR.insertCell();
+                let TDPrecio = TR.insertCell();
                 let TDAcciones = TR.insertCell();  // Añadir celda para acciones
 
                 TDCodigo.innerHTML = Codigo;
                 TDNombre.innerHTML = Nombre;
                 TDCantidad.innerHTML = Cantidad;
+                TDPrecio.innerHTML = Precio;
 
                 TR.id = "fila_" + Codigo;  // Asignar id a la fila
 
@@ -162,7 +174,7 @@
                 botonEditar.type = "button";
                 botonEditar.onclick = function () {
                     // Llama a la función para abrir el modal de edición
-                    AbrirModalEdicion(Codigo, Nombre, Cantidad);
+                    AbrirModalEdicion(Codigo, Nombre, Cantidad, Precio);
                 };
 
                 let botonEliminar = document.createElement("button");
@@ -181,10 +193,11 @@
                 document.getElementById("ProductoCodigo").value = "";
                 document.getElementById("ProductoNombre").value = "";
                 document.getElementById("ProductoCantidad").value = "";
+                document.getElementById("ProductoPrecio").value = "";
 
             } else {
                 // Mostrar un mensaje de error si los datos son inválidos
-                alert("Por favor, ingrese un código válido, un nombre válido y una cantidad válida mayor a cero.");
+                alert("Por favor, ingrese un código válido, un nombre válido y una cantidad y precio válida mayor a cero.");
             }
         }
 
@@ -199,9 +212,12 @@
             }
         }
 
-        function AbrirModalEdicion(codigo, nombre, cantidad) {
+        function AbrirModalEdicion(codigo, nombre, cantidad, precio) {
             // Pasa la cantidad al modal
             document.getElementById("nuevaCantidad").value = cantidad;
+
+            //pasa el precio al modal
+            document.getElementById("nuevoPrecio").value = precio;
 
             // Pasa el nombre al modal
             document.getElementById("nombreProducto").textContent = nombre;
@@ -220,17 +236,23 @@
         function GuardarEdicion() {
             // Obtén la nueva cantidad del campo en el modal
             const nuevaCantidad = parseInt(document.getElementById("nuevaCantidad").value);
+            const nuevoPrecio = parseFloat(document.getElementById("nuevoPrecio").value);
 
-            if (!isNaN(nuevaCantidad) && nuevaCantidad > 0) {
+            if (!isNaN(nuevaCantidad) && nuevaCantidad > 0
+                && !isNaN(nuevoPrecio) && nuevoPrecio > 0) {
+                nuevoPrecio = nuevoPrecio.replace(".", ",");
+
                 const fila = document.getElementById("fila_" + ultimoCodigoSeleccionado);
                 if (fila) {
                     fila.querySelector("td:nth-child(3)").textContent = nuevaCantidad;
+                    fila.querySelector("td:nth-child(4)").textContent = nuevoPrecio;
+
                 }
 
                 // Cierra el modal de edición
                 CerrarModalEdicion();
             } else {
-                alert("Por favor, ingrese una cantidad válida mayor a cero.");
+                alert("Por favor, ingrese un precio y cantidad válida mayor a cero.");
             }
         }
 
@@ -293,12 +315,14 @@
                 let codigo = fila.cells[0].innerText;  // la celda 0 contiene el código
                 let nombre = fila.cells[1].innerText;  // la celda 1 contiene el nombre
                 let cantidad = parseInt(fila.cells[2].innerText);  // la celda 2 contiene la cantidad
+                let precio = parseFloat(fila.cells[3].innerText);  // la celda 3 contiene el precio
 
                 // Crear un objeto con los datos de la fila
                 let detalle = {
                     Codigo: codigo,
                     Nombre: nombre,
-                    Cantidad: cantidad
+                    Cantidad: cantidad,
+                    Precio:precio
                 };
 
                 // Agregar el objeto al array

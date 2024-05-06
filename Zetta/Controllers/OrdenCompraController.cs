@@ -139,7 +139,8 @@ namespace Zetta.Controllers
                                 ProductoId = productoIdSeleccionado.Value,
                                 Codigo = detalle.Codigo,
                                 Nombre = detalle.Nombre,
-                                Cantidad = detalle.Cantidad
+                                Cantidad = detalle.Cantidad,
+                                Precio = detalle.Precio
                             };
 
                             _context.Add(ordenCompraDetalle);
@@ -316,6 +317,7 @@ namespace Zetta.Controllers
                     {
                         ProductoId = ObtenerProductoIdPorCodigo(nuevoDetalle.Codigo).Value,
                         Cantidad = nuevoDetalle.Cantidad,
+                        Precio = nuevoDetalle.Precio,
                         Codigo = nuevoDetalle.Codigo,
                         Nombre = nuevoDetalle.Nombre,
                         OrdenCompra = ordenCompra
@@ -406,39 +408,128 @@ namespace Zetta.Controllers
             return View(viewModel);
         }
 
+        [HttpPost]
+        public IActionResult CargarCompra(CompraVM viewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {                   
+
+                    // 2. Cambiar puntualmente el estado de la Orden de Compra asociada
+                    CambiarEstadoOrdenCompra(viewModel);
+
+                    // 3. Cambiar el precio del producto en la tabla Productos
+                    ActualizarPrecioProductos(viewModel);
+
+                    // 1. Generar una fila en la tabla Stock
+                    GenerarFilaStock(viewModel);
+
+                    TempData["success"] = "Factura cargada exitosamente!";
+
+                    return RedirectToAction("Index"); // Redirigir a alguna página de éxito
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", $"Error al cargar la factura de compra: {ex.Message}");
+                    // Manejar el error de alguna manera apropiada, como mostrar un mensaje de error en la vista
+                }
+            }
+
+            // Si llegamos aquí, significa que ocurrió un error, así que volvemos a cargar la vista
+            return View(viewModel);
+        }
+
+        // Métodos auxiliares para realizar las operaciones específicas
+
+        private void GenerarFilaStock(CompraVM viewModel)
+        {
+            foreach (var detalle in viewModel.DetallesFactura)
+            {
+                // Recuperar el producto correspondiente de la base de datos
+                var producto = _context.Producto.FirstOrDefault(p => p.Id == detalle.ProductoId);
+
+                if (producto != null)
+                {
+                    // Actualizar el stock del producto
+                    producto.Stock += detalle.Cantidad;
+
+                    // Crear y guardar la entrada en la tabla Stock
+                    var nuevaEntradaStock = new Stock
+                    {
+                        ProductoId = detalle.ProductoId,
+                        Cantidad = detalle.Cantidad,
+                        Fecha = viewModel.FechaFactura,
+                        Concepto = "Compras",
+                        NroComprobante = viewModel.NumeroFactura
+                    };
+
+                    _context.Stock.Add(nuevaEntradaStock);
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    TempData["error"] = "No se encontró el Producto con el Id indicado";
+                    continue; 
+
+                }
+            }
+        }
+
+
+        private void CambiarEstadoOrdenCompra(CompraVM viewModel)
+        {
+            // Obtener los IDs únicos de las órdenes de compra asociadas a los detalles de la factura
+            var ordenesCompraIds = viewModel.DetallesFactura
+                .Select(detalle => detalle.OrdenCompraId)
+                .Distinct()
+                .ToList();
+
+            // Obtener las órdenes de compra asociadas a los IDs obtenidos
+            var ordenesCompra = _context.OrdenCompra
+                .Where(orden => ordenesCompraIds.Contains(orden.Id))
+                .ToList();
+
+            // Cambiar el estado de cada orden de compra a "Procesada"
+            foreach (var orden in ordenesCompra)
+            {
+                orden.Estado = EstadoOrden.Procesada;
+            }
+
+            // Guardar los cambios en la base de datos
+            _context.SaveChanges();
+        }
+
+        private void ActualizarPrecioProductos(CompraVM viewModel)
+        {
+            // Iterar por cada detalle de la factura y actualizar el precio del producto en la tabla Productos
+            foreach (var detalle in viewModel.DetallesFactura)
+            {
+                var producto = _context.Producto.Find(detalle.ProductoId);
+                if (producto != null)
+                {
+                    producto.Costo = (double)detalle.Precio; 
+                }
+            }
+
+            // Guardar los cambios en la base de datos
+            _context.SaveChanges();
+        }
 
         // Otras acciones del controlador...
 
         [HttpGet]
-        public IActionResult ObtenerDetallesOrdenCompra(string ordenIds)
+        public IActionResult ObtenerDetallesOrdenCompra(int[] ordenIds)
         {
             try
             {
-                List<int> ids = ordenIds.Split(',').Select(int.Parse).ToList();
-
-                // Lista para almacenar los detalles de las órdenes de compra
-                List<OrdenCompraDetalle> detalles = new List<OrdenCompraDetalle>();
-
-                // Iterar sobre cada ID de orden de compra recibido
-                foreach (int orderId in ids)
-                {
-                    // Buscar la orden de compra en la base de datos
-                    var ordenCompra = _context.OrdenCompra
-                        .Include(o => o.OrdenCompraDetalle) // Cargar los detalles de la orden de compra
-                        .FirstOrDefault(o => o.Id == orderId);
-
-                    if (ordenCompra != null)
-                    {
-                        // Agregar los detalles de la orden de compra a la lista
-                        detalles.AddRange(ordenCompra.OrdenCompraDetalle);
-                    }
-                }
+                // Obtener los detalles de las órdenes de compra según los IDs recibidos
+                var detalles = _context.OrdenCompraDetalle
+                    .Where(detalle => ordenIds.Contains(detalle.OrdenCompraId))
+                    .ToList();
 
                 // Devolver los detalles de las órdenes de compra en formato JSON
-                return Json(detalles, new JsonSerializerOptions
-                {
-                    ReferenceHandler = ReferenceHandler.Preserve
-                });
+                return Json(detalles);
             }
             catch (Exception ex)
             {
@@ -566,7 +657,7 @@ namespace Zetta.Controllers
         }
 
         //HASTA ACA ESTA BIEN!!********************************************************************************************************
-
+      
         public IActionResult MostrarPDFenPagina(int id)
         {
             string urlBase = $"{Request.Scheme}://{Request.Host}";

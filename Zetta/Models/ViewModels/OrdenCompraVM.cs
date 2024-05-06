@@ -14,12 +14,13 @@ namespace Zetta.Models.ViewModels
         public string ProductoCodigo { get; set; } // Código del producto seleccionado
         public string ProductoNombre { get; set; } // Nombre del producto seleccionado
         public int? ProductoCantidad { get; set; } // Cambiado a int? (nullable)
-
+        public decimal? ProductoPrecio { get; set; }
     }
 
     public class OrdenDetalle
     {
         public int Cantidad { get; set; }
+        public decimal Precio { get; set; }
         public string Codigo { get; set; }
         public string Nombre { get; set; }
         public int ProductoId { get; set; }
