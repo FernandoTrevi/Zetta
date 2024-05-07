@@ -199,7 +199,7 @@
                                 value: detalle.precio,
                                 step: '0.01', // para permitir decimales
                                 min: '0', // valor mínimo
-                                class: 'editable-precio form-control text-right' 
+                                class: 'editable-precio form-control text-right'
                             });
                             fila.append($('<td></td>').append(precioInput));
                             // Crear un elemento para mostrar el subtotal
@@ -211,6 +211,9 @@
                                 var nuevoPrecio = parseFloat(precioInput.val());
                                 var subtotal = detalle.cantidad * nuevoPrecio;
                                 subtotalElement.text('$' + subtotal.toFixed(2));
+                                if (typeof precioHiddenInput !== 'undefined') {
+                                    precioHiddenInput.val(nuevoPrecio);
+                                }
                             }
 
                             // Escuchar el evento de cambio en el campo de entrada de precio
@@ -221,7 +224,7 @@
 
                             // Calcular y mostrar el subtotal inicial
                             actualizarSubtotal();
-                            
+
                             // Crear inputs para cada propiedad del detalle
                             var productoIdInput = $('<input>', {
                                 type: 'hidden',
@@ -267,10 +270,10 @@
                             fila.append(precioHiddenInput);
                             fila.append(totalInput);
                             fila.append(ordenCompraIdInput);
-                          
+
                             // Agregar la fila a la tabla
                             $('#productosFactura tbody').append(fila);
-                           
+
 
                         });
 

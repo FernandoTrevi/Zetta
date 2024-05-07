@@ -1,0 +1,95 @@
+﻿@model Zetta.Models.ViewModels.ClienteVM
+
+@{
+    ViewData["Title"] = "Editar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form method="post" asp-action="Editar">
+    <input asp-for="Cliente.Id" hidden />
+    <div class="border p-3 ">
+
+        <div asp-validation-summary="ModelOnly" class="text-danger">
+        </div>
+
+        <div class="form-group row">
+            <h2 class="text-info pl-3">Editar Cliente</h2>
+        </div>
+        <hr />
+
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <label asp-for="Cliente.Nombre" class="form-label">Razón Social</label>
+                    <input asp-for="Cliente.Nombre" class="form-control" />
+                    <span asp-validation-for="Cliente.Nombre" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Cliente.Direccion" class="form-label">Dirección</label>
+                    <input asp-for="Cliente.Direccion" class="form-control" />
+                    <span asp-validation-for="Cliente.Direccion" class="text-danger"></span>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-md-6">
+                    <label asp-for="Cliente.Localidad" class="form-label">Localidad</label>
+                    <input asp-for="Cliente.Localidad" class="form-control" />
+                    <span asp-validation-for="Cliente.Localidad" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Cliente.ProvinciaId" class="form-label">Provincia</label>
+                    <select asp-for="Cliente.ProvinciaId" asp-items="@Model.ProvinciaLista" class="form-select">
+                        <option disabled selected>--Seleccione una Provincia</option>
+                    </select>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-md-6">
+                    <label asp-for="Cliente.Telefono" class="form-label">Teléfono</label>
+                    <input asp-for="Cliente.Telefono" class="form-control" />
+                    <span asp-validation-for="Cliente.Telefono" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Cliente.Email" class="form-label">Email</label>
+                    <input asp-for="Cliente.Email" class="form-control" />
+                    <span asp-validation-for="Cliente.Email" class="text-danger"></span>
+                </div>
+            </div>
+           
+            <br />
+            <div class="row">
+                <div class="col-md-6">
+                    <label asp-for="Cliente.CondIvaId" class="form-label">C.F.IVA</label>
+                    <select asp-for="Cliente.CondIvaId" asp-items="@Model.CondIvaLista" class="form-select">
+                        <option disabled selected>--Seleccione una Condición</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Cliente.Dni" class="form-label">C.U.I.T. / D.N.I.</label>
+                    <input asp-for="Cliente.Dni" class="form-control" />
+                    <span asp-validation-for="Cliente.Dni" class="text-danger"></span>
+                </div>
+            </div>
+            <br />
+
+            <div class="row p-1">
+                <div class="col-6 col-md-3">
+                    <button type="submit" class="btn btn-primary form-control">Actualizar</button>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a asp-controller="Cliente" asp-action="Index" class="btn btn-secondary form-control">Regresar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
+

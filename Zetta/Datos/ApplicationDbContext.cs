@@ -21,6 +21,8 @@ namespace Zetta.Datos
         public DbSet<Proveedor> Proveedor { get; set; }
         public DbSet<OrdenCompra> OrdenCompra { get; set; }
         public DbSet<OrdenCompraDetalle> OrdenCompraDetalle { get; set; }
+        public DbSet<Cliente> Cliente { get; set; }
+
 
     }
 }

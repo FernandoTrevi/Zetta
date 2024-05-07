@@ -50,12 +50,13 @@ namespace Zetta.Controllers
 
             if (ordenActual == "nroorden")
             {
-                query = query.OrderBy(o => o.NroOrden);
+                query = query.OrderByDescending(o => o.NroOrden);
             }
             else
             {
-                query = query.OrderBy(o => o.Id); // Orden predeterminado
+                query = query.OrderByDescending(o => o.Id); 
             }
+
 
             int cantidadregistros = 5; // Cambia esta cantidad según tus preferencias
             var paginacion = await Paginacion<OrdenCompra>.CrearPaginacion(query, numpag ?? 1, cantidadregistros);
@@ -508,7 +509,8 @@ namespace Zetta.Controllers
                 var producto = _context.Producto.Find(detalle.ProductoId);
                 if (producto != null)
                 {
-                    producto.Costo = (double)detalle.Precio; 
+                    producto.Costo = (double)detalle.Precio;
+                    producto.Precio = (double)detalle.Precio * (1 + (producto.Margen / 100));
                 }
             }
 
