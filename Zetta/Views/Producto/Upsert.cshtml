@@ -106,8 +106,19 @@
                         </div>
                     </div>
                     <br />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label asp-for="Producto.Iva" class="form-label">I.V.A. %</label>
+                            <select asp-for="Producto.Iva" id="Iva" class="form-select">
+                                <option disabled selected>--Seleccione I.V.A. %</option>
+                                <option value="21">21</option>
+                                <option value="10.5">10,5</option>
+                            </select>
+                            <span asp-validation-for="Producto.Iva" class="text-danger"></span>
+                        </div>
+                    </div>
 
-
+                    <br />
                     <div class="form-group">
                         <div class="col-md-6">
                             <label asp-for="Producto.StockMinimo">Stock Mínimo</label>
@@ -186,7 +197,6 @@
             return true;
         }
 
-        // Para lograr el cálculo del campo "Precio" en la vista, debemos agregar un script en JavaScript
         // que se ejecute cuando los campos "Costo" y "Margen" cambien.
         // Cálculo del campo "Precio" en la vista
         $(function () {

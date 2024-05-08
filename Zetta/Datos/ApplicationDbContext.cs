@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Zetta.Models;
+using Zetta.Models.ViewModels;
 
 
 namespace Zetta.Datos
@@ -22,6 +23,8 @@ namespace Zetta.Datos
         public DbSet<OrdenCompra> OrdenCompra { get; set; }
         public DbSet<OrdenCompraDetalle> OrdenCompraDetalle { get; set; }
         public DbSet<Cliente> Cliente { get; set; }
+        public DbSet<OrdenVenta> OrdenVenta { get; set; }
+        public DbSet<OrdenVentaDetalle> OrdenVentaDetalle { get; set; }
 
 
     }

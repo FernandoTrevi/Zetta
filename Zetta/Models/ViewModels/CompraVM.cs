@@ -7,9 +7,9 @@ namespace Zetta.Models.ViewModels
     {
         public DateTime FechaFactura { get; set; }
 
-        public int ProveedorId { get; set; } // Agregamos la propiedad ProveedorId
+        public int ProveedorId { get; set; } 
 
-        public string NombreProveedor { get; set; } // Agregamos la propiedad NombreProveedor
+        public string NombreProveedor { get; set; } 
 
         public IEnumerable<SelectListItem> ProveedorLista { get; set; }
 

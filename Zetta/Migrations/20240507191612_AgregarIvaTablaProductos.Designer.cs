@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Zetta.Datos;
 
@@ -11,9 +12,10 @@ using Zetta.Datos;
 namespace Zetta.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240507191612_AgregarIvaTablaProductos")]
+    partial class AgregarIvaTablaProductos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -388,97 +390,6 @@ namespace Zetta.Migrations
                     b.ToTable("OrdenCompraDetalle");
                 });
 
-            modelBuilder.Entity("Zetta.Models.OrdenVenta", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("ClienteId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CondicionPago")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Estado")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Fecha")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("Iva10")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Iva21")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("NroOrdenVenta")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Observaciones")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Subtotal")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("Vencimiento")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Vendedor")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClienteId");
-
-                    b.ToTable("OrdenVenta");
-                });
-
-            modelBuilder.Entity("Zetta.Models.OrdenVentaDetalle", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("Cantidad")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Codigo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Descuento")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Iva")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("OrdenVentaId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Precio")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("ProductoId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrdenVentaId");
-
-                    b.HasIndex("ProductoId");
-
-                    b.ToTable("OrdenVentaDetalle");
-                });
-
             modelBuilder.Entity("Zetta.Models.Producto", b =>
                 {
                     b.Property<int>("Id")
@@ -747,36 +658,6 @@ namespace Zetta.Migrations
                     b.Navigation("Producto");
                 });
 
-            modelBuilder.Entity("Zetta.Models.OrdenVenta", b =>
-                {
-                    b.HasOne("Zetta.Models.Cliente", "Cliente")
-                        .WithMany()
-                        .HasForeignKey("ClienteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Cliente");
-                });
-
-            modelBuilder.Entity("Zetta.Models.OrdenVentaDetalle", b =>
-                {
-                    b.HasOne("Zetta.Models.OrdenVenta", "OrdenVenta")
-                        .WithMany("OrdenVentaDetalle")
-                        .HasForeignKey("OrdenVentaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Zetta.Models.Producto", "Producto")
-                        .WithMany()
-                        .HasForeignKey("ProductoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("OrdenVenta");
-
-                    b.Navigation("Producto");
-                });
-
             modelBuilder.Entity("Zetta.Models.Producto", b =>
                 {
                     b.HasOne("Zetta.Models.Categoria", "Categoria")
@@ -829,11 +710,6 @@ namespace Zetta.Migrations
             modelBuilder.Entity("Zetta.Models.OrdenCompra", b =>
                 {
                     b.Navigation("OrdenCompraDetalle");
-                });
-
-            modelBuilder.Entity("Zetta.Models.OrdenVenta", b =>
-                {
-                    b.Navigation("OrdenVentaDetalle");
                 });
 #pragma warning restore 612, 618
         }

@@ -40,6 +40,9 @@ namespace Zetta.Models
         [DataType(DataType.Currency)]
         public double Precio { get; set; }
 
+        [Required]
+        public double Iva { get; set; }
+
         public int Stock { get; set; }
 
         public int StockMinimo { get; set; }

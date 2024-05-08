@@ -112,9 +112,10 @@ namespace Zetta.Controllers
             {
                 var files = HttpContext.Request.Form.Files;
                 string webRootPath = _webHostEnvironment.WebRootPath;
+                const double IvaAjustar = 105;
 
                 if (productoVM.Producto.Id == 0)
-                {
+                {   
                     // Crear
                     string upload = webRootPath + WC.ImagenRuta;
                     string fileName = Guid.NewGuid().ToString();
@@ -162,11 +163,16 @@ namespace Zetta.Controllers
                     // Copiar el valor existente de Stock al objeto productoVM.Producto
                     productoVM.Producto.Stock = objProducto.Stock;
 
+                    if(productoVM.Producto.Iva == IvaAjustar)
+                    {
+                        productoVM.Producto.Iva /= 10;
+                    }
                     // Realizar la actualización del producto en la base de datos
                     _db.Producto.Update(productoVM.Producto);
 
-                }
+                }                                                           
                 productoVM.Producto.Precio = Math.Round(productoVM.Producto.Precio, 2);
+               
                 _db.SaveChanges();
                 return RedirectToAction("Index");
             } // If ModelIsValid
