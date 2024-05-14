@@ -93,13 +93,13 @@
                                         <a class="nav-link text-dark" asp-area="" asp-controller="Cliente" asp-action="Index">Clientes</a>
                                     </li>
                                     <li>
-                                        <a class="nav-link text-dark" asp-area="" asp-controller="Presupuesto" asp-action="Index">Presupuesto</a>
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="OrdenVenta" asp-action="Index" asp-route-presupuesto="true">Presupuesto</a>
                                     </li>
                                     <li>
-                                        <a class="nav-link text-dark" asp-area="" asp-controller="OrdenVenta" asp-action="Index">Órdenes de Venta</a>
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="OrdenVenta" asp-action="Index" asp-route-presupuesto="false">Órdenes de Venta</a>
                                     </li>
                                     <li>
-                                        <a class="nav-link text-dark" asp-area="" asp-controller="OredenVenta" asp-action="Crear">Nueva Venta</a>
+                                        <a asp-controller="OrdenVenta" asp-action="Crear" class="nav-link text-dark" asp-route-presupuesto="false">Nueva Venta</a>
                                     </li>
                                    
 

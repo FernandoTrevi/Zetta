@@ -1,26 +1,47 @@
 ﻿@using Zetta.Datos;
 
 
-@model Paginacion<Zetta.Models.OrdenCompra>
+@model Paginacion<Zetta.Models.OrdenVenta>
 
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var presupuesto = ViewData["Presupuesto"] as bool?;
+
 }
 
 <div class="container p-2">
     <div class="row p-2">
-        <div class="col-6">
-            <h2 class="text-info">Listado de Órdenes de Compra</h2>
-        </div>
+        @if (presupuesto.HasValue && presupuesto.Value)
+        {
+            <div class="col-6">
+                <h2 class="text-info">Listado de Presupuestos</h2>
+            </div>
+        }
+        else
+        {
+            <div class="col-6">
+                <h2 class="text-info">Listado de Órdenes de Venta</h2>
+            </div>
+        }
+       
         <div class="col-6 text-end">
-            <a asp-controller="OrdenCompra" asp-action="Crear" class="btn btn-primary">
-                <i class="fas fa-plus"></i>  Nueva Orden de Compra
-            </a>
+            @if (presupuesto.HasValue && presupuesto.Value)
+            {
+                <a asp-controller="OrdenVenta" asp-action="Crear" class="btn btn-primary" asp-route-presupuesto="true">
+                    <i class="bi bi-plus"></i>  Nuevo Presupuesto
+                </a>
+            }
+            else
+            {
+                <a asp-controller="OrdenVenta" asp-action="Crear" class="btn btn-primary" asp-route-presupuesto="false">
+                    <i class="bi bi-plus"></i>  Nueva Venta
+                </a>
+            }
         </div>
     </div>
 
-    <form asp-controller="OrdenCompra" asp-action="Index">
+    <form asp-controller="OrdenVenta" asp-action="Index">
         <p>
             Buscar: <input type="text" name="buscar" class="form-text" />
             <input type="submit" value="Buscar" class="btn btn-sm btn-dark" />
@@ -35,36 +56,30 @@
         <table class="table table-bordered table-striped table-hover">
             <thead>
                 <tr class="table-dark text-center">
-                    <th>N°Orden</th>
+                    <th>Número</th>
                     <th>Fecha</th>
-                    <th>Proveedor</th>
-                    <th>Observaciones</th>
+                    <th>Cliente</th>
                     <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
 
             <tbody>
-                @foreach (var ordenCompra in Model)
+                @foreach (var OrdenVenta in Model)
                 {
                     <tr>
-                        <td>@ordenCompra.NroOrden</td>
-                        <td>@ordenCompra.Fecha.ToShortDateString()</td>
-                        <td>@ordenCompra.Proveedor.Razonsocial</td>
-                        <td>@ordenCompra.Observaciones</td>
-                        <td>@ordenCompra.Estado</td>
+                        <td>@OrdenVenta.NroOrdenVenta</td>
+                        <td>@OrdenVenta.Fecha.ToShortDateString()</td>
+                        <td>@OrdenVenta.Cliente.Nombre</td>
+                        <td>@OrdenVenta.Estado</td>
                         <td class="text-center">
                             <div class="w-75 btn-group" role="group">
-                                @{
-                                    bool disableEdit = ordenCompra.Estado != EstadoOrden.Pendiente;
-                                }
-                                <a asp-action="Editar" asp-route-id="@ordenCompra.Id" class="btn btn-primary mx-2 @(disableEdit ? "disabled" : "")">
-                                    <i class="bi bi-pencil-square"></i>
-                                </a>
-                                <a asp-action="Ver" asp-route-id="@ordenCompra.Id" class="btn btn-primary mx-2">
+                               
+                               
+                                <a asp-action="Ver" asp-route-id="@OrdenVenta.Id" class="btn btn-primary mx-2">
                                     <i class="bi bi-eye"></i>
                                 </a>
-                                <a asp-action="Eliminar" asp-route-id="@ordenCompra.Id" class="btn btn-danger mx-2">
+                                <a asp-action="Eliminar" asp-route-id="@OrdenVenta.Id" class="btn btn-danger mx-2">
                                     <i class="bi bi-trash"></i>
                                 </a>
                             </div>
@@ -100,10 +115,12 @@
     }
     else
     {
-        <p>No hay registros de Ordenes de Compras</p>
+        <p>No Se encontraron registros</p>
     }
 
-    
 
-   
+
+
 </div>
+
+

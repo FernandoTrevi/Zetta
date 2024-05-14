@@ -1,0 +1,443 @@
+﻿@model Zetta.Models.ViewModels.OrdenVentaVM
+
+@{
+    ViewData["Title"] = "Crear";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var presupuesto = ViewData["Presupuesto"] as bool?;
+
+}
+
+<div class="border p-3">
+    <div class="form-group row">
+        @if (presupuesto.HasValue && presupuesto.Value)
+        {
+            <h2 class="text-info">Crear Presupuesto</h2>
+        }
+        else
+        {
+            <h2 class="text-info">Nueva Venta</h2>
+        }
+    </div>
+    <hr />
+        <form asp-controller="OrdenVenta" asp-action="Crear" method="post">
+            @if (presupuesto.HasValue && presupuesto.Value)
+            {
+                <div class="row">
+                    <div class="col-md-3">
+                        <label asp-for="OrdenVenta.NroOrdenVenta" class="form-label">Nro de Orden</label>
+                        <input asp-for="OrdenVenta.NroOrdenVenta" class="form-control" />
+                        <span asp-validation-for="OrdenVenta.NroOrdenVenta" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="FechaActual" class="form-label">Fecha</label>
+                        <input type="date" class="form-control" asp-for="FechaActual" value="@Model.FechaActual.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Validez (días)</label>
+                        <input type="number" id="diasValidez" class="form-control" value="5" />
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="OrdenVenta.Vencimiento" class="form-label">Vencimiento</label>
+                        <input type="date" id="fechaVencimiento" class="form-control" asp-for="OrdenVenta.Vencimiento" readonly />
+                    </div>
+                </div>
+
+            }
+            else
+            {
+                <div class="row">
+                    <div class="col-md-6">
+                        <label asp-for="OrdenVenta.NroOrdenVenta" class="form-label">Nro de Orden</label>
+                        <input asp-for="OrdenVenta.NroOrdenVenta" class="form-control" />
+                        <span asp-validation-for="OrdenVenta.NroOrdenVenta" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="FechaActual" class="form-label">Fecha</label>
+                        <input type="date" class="form-control" asp-for="FechaActual" value="@Model.FechaActual.ToString("yyyy-MM-dd")" />
+                    </div>
+                </div>
+            }
+            <br />
+        <div class="row">
+            <div class="col-md-6">
+                <label asp-for="OrdenVenta.ClienteId" class="form-label">Cliente</label>
+                <select asp-for="OrdenVenta.ClienteId" asp-items="@Model.ClienteLista" class="form-select">
+                    <option disabled selected>--Seleccione un Cliente</option>
+                </select>
+                <span asp-validation-for="OrdenVenta.ClienteId" class="text-danger"></span>
+
+            </div>
+            <div class="col-md-6">
+                <label asp-for="OrdenVenta.Vendedor" class="form-label">Vendedor</label>
+                <input asp-for="OrdenVenta.Vendedor" class="form-control" />
+                <span asp-validation-for="OrdenVenta.Vendedor" class="text-danger"></span>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-md-6">
+                <label asp-for="OrdenVenta.CondicionPago" class="form-label">Condición de Pago</label>
+                <select asp-for="OrdenVenta.CondicionPago" class="form-control">
+                    <option value="">Seleccionar Condición de Pago</option>
+                    <option value="Contado">Contado</option>
+                    <option value="Cheque">Cheque</option>
+                    <option value="Tarjeta">Tarjeta</option>
+                    <option value="Transferencia">Transferencia</option>
+                </select>
+                <span asp-validation-for="OrdenVenta.CondicionPago" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="OrdenVenta.Observaciones" class="form-label">Observaciones</label>
+                <input asp-for="OrdenVenta.Observaciones" class="form-control" />
+                <span asp-validation-for="OrdenVenta.Observaciones" class="text-danger"></span>
+            </div>
+        </div>
+        <br />
+        <h3 class="text-info">Agregar detalles</h3>
+        <hr />
+        <br />
+
+        <div class="row align-items-end">
+            <div class="col-md-2">
+                <label asp-for="ProductoCodigo" class="form-label">Código</label>
+                <select asp-for="ProductoCodigo" id="ProductoCodigo" class="form-select">
+                    <option value="" disabled selected>--Seleccione un Código</option>
+                    @foreach (var producto in Model.Productos)
+                    {
+                        <option value="@producto.Codigo">@producto.Codigo</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="ProductoNombre" class="form-label">Nombre</label>
+                <select asp-for="ProductoNombre" id="ProductoNombre" class="form-select">
+                    <option value="" disabled selected>--Seleccione un Nombre</option>
+                    @foreach (var producto in Model.Productos)
+                    {
+                        <option value="@producto.Nombre">@producto.Nombre</option>
+                    }
+                </select>
+            </div>
+
+
+            <div class="col-md-1">
+                <label asp-for="ProductoCantidad" class="form-label">Cantidad</label>
+                <input asp-for="ProductoCantidad" id="ProductoCantidad" class="form-control" />
+                <span asp-validation-for="ProductoCantidad" class="text-danger"></span>
+            </div>
+            <div class="col-md-2">
+                <label asp-for="ProductoPrecio" class="form-label">Precio</label>
+                <input asp-for="ProductoPrecio" id="ProductoPrecio" class="form-control" type="number" step="0.1" onchange="cambioValorIva()" />
+                <span asp-validation-for="ProductoPrecio" class="text-danger"></span>
+            </div>
+            <div class="col-md-2">
+                <label asp-for="ProductoDescuento" class="form-label">% Bonif</label>
+                <input asp-for="ProductoDescuento" id="ProductoDescuento" class="form-control" type="number" step="0.1" />
+                <span asp-validation-for="ProductoDescuento" class="text-danger"></span>
+            </div>
+            <div class="col-md-2">
+                <label asp-for="ProductoIva" class="form-label">% I.V.A.</label>
+                <input asp-for="ProductoIva" id="ProductoIva" class="form-control" type="number" readonly />
+                <span asp-validation-for="ProductoIva" class="text-danger"></span>
+            </div>
+            
+           
+        </div>
+        <br />
+        <div class="row align-items-end">
+            <div class="col-md-10"></div>
+
+            <div class="col-md-2">
+                <button type="button" id="agregarProducto" onclick="AgregarDetalle()" class="btn btn-info form-control">Agregar</button>
+            </div>
+        </div>        
+        <br />
+        <div id="detalles">
+            <table id="tablaDetalle" class="table table-bordered table-striped table-hover">
+                <!-- Encabezado de la tabla -->
+                <thead>
+                    <tr class="table-dark text-center">
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unit.</th>
+                        <th>% Bonif.</th>
+                        <th>Subtotal</th>
+                        <th>Alicuota IVA</th>
+                        <th>Subtotal C/IVA</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <!-- Cuerpo de la tabla donde se agregarán filas dinámicamente -->
+                </tbody>
+
+                <tfoot>
+                    <tr>
+                        <td colspan="5"></td>
+                        <td><strong>Subtotal: </strong></td>
+                        <td class="text-lg-end"><span id="subtotalAmount">$0.00</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5"></td>
+                        <td><strong>IVA (10.5 %): </strong></td>
+                        <td class="text-lg-end"><span id="ivaAmount10">$0.00</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5"></td>
+                        <td><strong>IVA (21 %): </strong></td>
+                        <td class="text-lg-end"><span id="ivaAmount21">$0.00</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5"></td>
+                        <td class="text-bg-dark"><strong>Total: </strong></td>
+                        <td class="text-lg-end"><span id="totalAmount"><strong>$0.00</strong></span></td>
+                    </tr>
+                </tfoot>
+            </table>
+
+        </div>
+        <br />
+
+
+
+        <div class="row">
+
+            @if (presupuesto.HasValue && presupuesto.Value)
+            {
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary form-control" onclick="ValidarYEnviar(event)">Confirmar Presupuesto</button>
+                </div>
+            }
+            else
+            {
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary form-control" onclick="ValidarYEnviar(event)">Confirmar Orden</button>
+                </div>
+            }
+           
+
+
+
+            <div class="col-md-3">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-secondary form-control">Regresar</a>
+            </div>
+        </div>
+        <br />
+        </form>
+
+
+</div>
+
+@section Scripts{
+    <script>
+        var productos = @Html.Raw(Json.Serialize(Model.Productos));
+        
+   
+        function AgregarDetalle() {
+            var codigo = $("#ProductoCodigo").val();
+            var nombre = $("#ProductoNombre").val();
+            var cantidad = $("#ProductoCantidad").val();
+            var precioUnitario = parseFloat($("#ProductoPrecio").val());
+            var iva = parseFloat($("#ProductoIva").val());
+            var descuento = parseFloat($("#ProductoDescuento").val() || 0);
+            var subtotal = cantidad * precioUnitario;
+            var descuentoAplicado = subtotal * (descuento / 100);
+            var subtotalConDescuento = subtotal - descuentoAplicado;
+            var subtotalConIva = subtotalConDescuento * (iva / 100);
+            var totalDetalle = subtotalConDescuento + subtotalConIva;
+
+
+            // Verificar si el producto ya existe en la tabla
+            var productosEnTabla = $("#tablaDetalle tbody tr td:eq(0)").map(function () {
+                return $(this).text();
+            }).get();
+
+            if (productosEnTabla.includes(nombre)) {
+                alert("El producto ya está en la tabla.");
+                limpiarCampos();
+                return;
+            }
+            if (codigo && nombre && cantidad && precioUnitario && !isNaN(cantidad) && cantidad > 0
+                && !isNaN(precioUnitario) && precioUnitario > 0) {
+                // Crear la fila de la tabla con los datos del producto y el total
+                var fila = "<tr>" +
+                    "<td>" + nombre + "</td>" +
+                    "<td>" + cantidad + "</td>" +
+                    "<td class='text-end'>" + precioUnitario.toFixed(2) + "</td>" +
+                    "<td class='text-end'>" + descuento.toFixed(2) + "</td>" +
+                    "<td class='text-end'>" + subtotalConDescuento.toFixed(2) + "</td>" +
+                    "<td class='text-end'>" + iva.toFixed(2) + "</td>" +
+                    "<td class='text-end'>" + totalDetalle.toFixed(2) + "</td>" +
+                    "<td><button type='button' class='btn btn-danger' onclick='EliminarFila(this)'><i class='bi bi-trash'></i></button></td>" +
+                    "</tr>";
+
+                // Agregar la fila a la tabla
+                $("#tablaDetalle tbody").append(fila);
+
+                limpiarCampos();
+
+
+                CalcularSubTotal();
+                CalcularTotal();
+                CalcularIva();
+            }
+            else {
+                alert("No se puede agrega el detalle porque hay datos incorrectos.");
+
+            }
+           
+        }
+        function limpiarCampos() {
+            document.getElementById("ProductoCodigo").value = "";
+            document.getElementById("ProductoNombre").value = "";
+            document.getElementById("ProductoCantidad").value = "";
+            document.getElementById("ProductoPrecio").value = "";
+            document.getElementById("ProductoIva").value = "";
+            document.getElementById("ProductoDescuento").value = "";
+        }
+
+        function CalcularTotal() {
+            var total = 0;
+            $("#tablaDetalle tbody tr").each(function () {
+                total += parseFloat($(this).find("td:eq(6)").text());
+            });
+            $("#totalAmount strong").text("$" + total.toFixed(2));
+        }
+        function CalcularSubTotal() {
+            var subTotal = 0;
+            $("#tablaDetalle tbody tr").each(function () {
+                subTotal += parseFloat($(this).find("td:eq(4)").text());
+            });
+            $("#subtotalAmount").text("$" + subTotal.toFixed(2));
+        }
+
+        function CalcularIva() {
+            var iva10 = 0;
+            var iva21 = 0;
+            $("#tablaDetalle tbody tr").each(function () {
+                var codigoProducto = $(this).find("td:eq(0)").text();
+                console.log("Código del producto:", codigoProducto);
+
+                var producto = productos.find(p => p.nombre === codigoProducto);
+                console.log("Producto encontrado:", producto);
+                if (producto) {
+                    if (producto.iva == 21) {
+                        subTotal = parseFloat($(this).find("td:eq(4)").text());
+                        alicuota = parseFloat($(this).find("td:eq(5)").text());
+                        iva21 += subTotal * (alicuota / 100);
+                    } else {
+                        subTotal = parseFloat($(this).find("td:eq(4)").text());
+                        alicuota = parseFloat($(this).find("td:eq(5)").text());
+                        iva10 += subTotal * (alicuota / 100);
+                    };
+                } else {
+                    alert("No se encontró producto");
+                };
+               
+            }); 
+
+            $("#ivaAmount21").text("$" + iva21.toFixed(2));
+            $("#ivaAmount10").text("$" + iva10.toFixed(2));
+
+        }
+
+
+        function EliminarFila(btn) {
+            $(btn).closest("tr").remove();
+            CalcularTotal();
+            CalcularSubTotal();
+            CalcularIva();
+        }
+    </script>
+
+    <script>
+        document.getElementById('diasValidez').addEventListener('input', function () {
+            // Obtener el valor de días de validez
+            var diasValidez = parseInt(this.value);
+
+            // Obtener la fecha actual
+            var fechaActual = new Date('@Model.FechaActual.ToString("yyyy-MM-dd")');
+
+            // Calcular la fecha de vencimiento sumando los días de validez a la fecha actual
+            var fechaVencimiento = new Date(fechaActual);
+            fechaVencimiento.setDate(fechaVencimiento.getDate() + diasValidez);
+
+            // Formatear la fecha de vencimiento
+            var fechaVencimientoFormateada = fechaVencimiento.getFullYear() + '-' + ('0' + (fechaVencimiento.getMonth() + 1)).slice(-2) + '-' + ('0' + fechaVencimiento.getDate()).slice(-2);
+
+            // Establecer el valor del campo de vencimiento
+            document.getElementById('fechaVencimiento').value = fechaVencimientoFormateada;
+        });
+        // Disparar el evento input para calcular el vencimiento inicialmente con el valor predeterminado
+        document.getElementById('diasValidez').dispatchEvent(new Event('input'));
+        
+        
+        
+
+    </script>
+    <script>
+        $(function () {
+            // Obtener los datos de productos disponibles
+            //var productos = @Html.Raw(Json.Serialize(Model.Productos));
+
+            function actualizarCampos(codigoSeleccionado, nombreSeleccionado) {
+               
+                // Si se cambió el producto
+                if (codigoSeleccionado) {
+                    console.log("Buscando producto por código:", codigoSeleccionado);
+                    // Buscar el producto correspondiente por código
+                    var producto = productos.find(p => p.codigo === codigoSeleccionado);
+                    console.log("Producto encontrado por código:", producto);
+                    // Si se encuentra el producto
+                    if (producto) {
+                        var iva = producto.iva;
+                        // Actualizar el nombre y el precio del producto
+                        console.log("Actualizando campos con producto encontrado por código:", producto);
+                        $("#ProductoNombre").val(producto.nombre);
+                        $("#ProductoPrecio").val(producto.precio);
+                        $("#ProductoIva").val(iva);
+
+                    }
+                }
+                // Si se cambió el código
+                else if (nombreSeleccionado) {
+                    // Buscar el producto correspondiente por nombre
+                    var producto = productos.find(p => p.nombre === nombreSeleccionado);
+                    // Si se encuentra el producto
+                    if (producto) {
+                        // Actualizar el código y el precio del producto
+                        var iva = producto.iva;
+
+                        $("#ProductoCodigo").val(producto.codigo);
+                        $("#ProductoPrecio").val(producto.precio);
+                        $("#ProductoIva").val(iva);
+
+                    }
+                }
+            }
+
+            // Agregar evento de cambio al campo de código de producto
+            $("#ProductoCodigo").change(function () {
+                var codigoSeleccionado = $(this).val();
+                var nombreSeleccionado = null;
+                console.log("Nombre seleccionado:", nombreSeleccionado);
+                console.log("Código seleccionado:", codigoSeleccionado);
+
+                // Actualizar campos
+                actualizarCampos(codigoSeleccionado, nombreSeleccionado);
+            });
+
+            // Agregar evento de cambio al campo de nombre de producto
+            $("#ProductoNombre").change(function () {
+                var nombreSeleccionado = $(this).val();
+                var codigoSeleccionado = null;
+                console.log("Nombre seleccionado:", nombreSeleccionado);
+                console.log("Código seleccionado:", codigoSeleccionado);
+
+                // Actualizar campos
+                actualizarCampos(codigoSeleccionado, nombreSeleccionado);
+            });
+        });
+    </script>
+}

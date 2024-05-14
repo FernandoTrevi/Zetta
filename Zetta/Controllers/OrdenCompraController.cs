@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using Humanizer;
 
 namespace Zetta.Controllers
 {
@@ -96,7 +97,7 @@ namespace Zetta.Controllers
                 // Asigna el último número de orden obtenido
                 OrdenCompra = new OrdenCompra { NroOrden = ultimoNumeroOrden },
                 // Inicializa la lista de detalles como una lista vacía
-                OrdenCompraDetalle = new List<OrdenCompraDetalle>()
+                OrdenCompraDetalle = new List<OrdenCompraDetalle>(),
             };
 
             return View(ordenCompraVM);
