@@ -1,0 +1,164 @@
+﻿@model Zetta.Models.ViewModels.OrdenVentaVM
+@{
+    ViewData["Title"] = "Ver";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    @if (Model.OrdenVenta.Estado == EstadoOrdenVenta.Procesada)
+    {
+        <div class="p-3 bg-info bg-opacity-10 border border-info border-start-0 rounded-end">
+            <h3>Remito</h3>
+        </div>
+    }
+    else
+    {
+        <div class="p-3 bg-info bg-opacity-10 border border-info border-start-0 rounded-end">
+            <h3>Presupuesto</h3>
+        </div>
+    }
+    
+
+        <div class="row mt-2 border-bottom border-black">
+            <div class="col-sm-6">
+                <!-- Datos de la empresa -->
+                <img src="\imagenes\LogoZETTA.jpeg" alt="Logo de la empresa" class="img-fluid" style="max-height: 40px;">
+                <p style="margin-bottom: 1px;">Sebastián Vera 383, (5800) Río Cuarto, Córdoba.</p>
+                <p style="margin-bottom: 1px;"><i class="bi bi-envelope-at"></i> ventas@zettacomputacion.com.ar</p>
+                <p style="margin-bottom: 1px;"><i class="bi bi-whatsapp"></i> 3585167469</p>
+            </div>
+
+            <div class="col-sm-6">
+                <!-- Número de OrdenVenta y fecha -->
+                <h5 class="mb-3"><strong> Número # @Model.OrdenVenta.NroOrdenVenta</strong></h5>
+            <h5><strong>Fecha:</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@Model.OrdenVenta.Fecha.ToString("dd/MM/yyyy")</h5>
+            @if (Model.OrdenVenta.Estado != EstadoOrdenVenta.Procesada)
+            {
+                <h5><strong>Vencimiento:</strong> &nbsp;  @Model.OrdenVenta.Vencimiento.ToString("dd/MM/yyyy")</h5>
+            }
+            </div>
+        </div>
+
+
+        <div class="row mt-2 flex-container ">
+            <div class="col-sm-6">
+                <!-- Datos del Cliente -->
+                <h5><strong>Datos del Cliente</strong></h5>
+                <p style="margin-bottom: 1px;"><strong>Nombre:</strong> @Model.OrdenVenta.Cliente.Nombre</p>
+                <p style="margin-bottom: 1px;"><strong>Dirección:</strong> @Model.OrdenVenta.Cliente.Direccion, @Model.OrdenVenta.Cliente.Localidad</p>
+                <p style="margin-bottom: 1px;"><strong>Teléfono:</strong> @Model.OrdenVenta.Cliente.Telefono</p>
+                <p style="margin-bottom: 1px;"><strong>E-mail:</strong> @Model.OrdenVenta.Cliente.Email</p>
+            </div>
+            <div class="col-sm-6">
+                <!-- Datos de Entrega -->
+                <p style="margin-bottom: 1px;"><strong>Vendedor:</strong> @Model.OrdenVenta.Vendedor</p>
+                <p style="margin-bottom: 1px;"><strong>Condición de pago:</strong> @Model.OrdenVenta.CondicionPago</p>
+                <p style="margin-bottom: 1px;"><strong>Observaciones:</strong> @Model.OrdenVenta.Observaciones</p>
+            </div>
+        </div>
+
+    <div class="row mt-3 small flex-container">
+            <div class="col-sm-12">
+                <!-- Tabla de productos -->
+            <div class="h4 pb-2 mb-4 text-success border-bottom border-success">
+                Detalle
+            </div>
+            <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr class="table-dark text-center">
+                            <th>Código</th>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unit.</th>
+                            <th>% Bonif.</th>
+                            <th>Subtotal</th>
+                            <th>Alicuota IVA</th>
+                            <th>Subtotal C/IVA</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var detalle in Model.OrdenVentaDetalle)
+                        {
+                            <tr style="margin-bottom: 1px; font-size: 16px;">
+                                <td>@detalle.Producto.Codigo</td>
+                                <td>@detalle.Producto.Nombre</td>
+                                <td class="text-center">@detalle.Cantidad</td>
+                                <td class="text-end">@detalle.Precio</td>
+                                <td class="text-center">@detalle.Descuento</td>
+                                <td class="text-end">@detalle.Subtotal</td>
+                                <td class="text-center">@detalle.Alicuota</td>
+                                <td class="text-end">@detalle.TotalDetalle</td>
+
+                            </tr>
+                        }
+                    @for (int i = 0; i < (8 - Model.OrdenVentaDetalle.Count); i++)
+                    {
+                        <tr class="d-print-none" style="height: 30px;">
+                            <td></td>
+                            <td></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                        </tr>
+                    }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5"></td>
+                            <td colspan="2"><strong>Subtotal: </strong></td>
+                            <td class="text-lg-end"><span>@Model.OrdenVenta.Subtotal</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5"></td>
+                            <td colspan="2"><strong>I.V.A. 10.5 %: </strong></td>
+                            <td class="text-lg-end"><span>@Model.OrdenVenta.Iva10</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5"></td>
+                            <td colspan="2"><strong>I.V.A. 21 %: </strong></td>
+                            <td class="text-lg-end"><span>@Model.OrdenVenta.Iva21</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5"></td>
+                            <td colspan="2"><strong>Total a pagar: </strong></td>
+                            <td class="text-lg-end"><span>@Model.OrdenVenta.TotalOrden</span></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+</div>
+
+<div class="row">
+    <div class="col-6 text-right">
+        <!-- Botones -->
+        <div class="mt-4 d-flex justify-content-end d-print-none gap-3">
+            @if (Model.OrdenVenta.Estado == EstadoOrdenVenta.Procesada)
+            {
+                <a asp-controller="OrdenVenta" asp-action="Index" asp-route-presupuesto="false" class="btn btn-secondary">Volver</a>
+            }
+            else
+            {
+                <a asp-controller="OrdenVenta" asp-action="Index" asp-route-presupuesto="true" class="btn btn-secondary">Volver</a>
+            }
+         
+            <a href="#" id="printButton" class="btn btn-primary">Imprimir</a>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        document.getElementById("printButton").addEventListener("click", function () {
+            window.print();
+        });
+    </script>
+     
+}
+

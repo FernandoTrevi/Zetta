@@ -32,10 +32,14 @@ namespace Zetta.Models
         [Required]
         public decimal Precio { get; set; }
 
+        public decimal Alicuota { get; set; }
+
         public decimal Iva {  get; set; }
 
         public decimal Descuento { get; set; }
 
-        public decimal TotalDetalle => (Cantidad * Precio) + Iva - Descuento;
+        public decimal Subtotal => (Cantidad * Precio) - Descuento;
+
+        public decimal TotalDetalle => Subtotal + Iva;
     }
 }

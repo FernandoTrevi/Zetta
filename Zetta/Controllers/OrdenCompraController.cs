@@ -351,9 +351,7 @@ namespace Zetta.Controllers
                 return NotFound();
             }
 
-            // Puedes mostrar una vista de confirmación de eliminación aquí
-            // y permitir que el usuario confirme antes de eliminar realmente la orden.
-
+            
             return View(ordenCompra);
         }
 

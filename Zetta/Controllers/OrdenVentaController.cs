@@ -102,9 +102,224 @@ namespace Zetta.Controllers
 
             return View(ordenVentaVM);
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Crear(OrdenVentaVM ordenVentaVM)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+
+                    // 1. Crear una nueva orden de Venta
+                    var ordenVenta = new OrdenVenta
+                    {
+                        NroOrdenVenta = ordenVentaVM.OrdenVenta.NroOrdenVenta,
+                        Fecha = ordenVentaVM.FechaActual,
+                        ClienteId = ordenVentaVM.OrdenVenta.ClienteId,
+                        Vencimiento = ordenVentaVM.OrdenVenta.Vencimiento,
+                        CondicionPago = ordenVentaVM.OrdenVenta.CondicionPago,
+                        Observaciones = ordenVentaVM.OrdenVenta.Observaciones,
+                        Vendedor = ordenVentaVM.OrdenVenta.Vendedor,
+                        Subtotal = ordenVentaVM.OrdenVenta.Subtotal / 100,
+                        Iva10 = ordenVentaVM.OrdenVenta.Iva10 / 100,
+                        Iva21 = ordenVentaVM.OrdenVenta.Iva21 / 100,
+                        Estado = ordenVentaVM.OrdenVenta.Estado,
+                    };
+
+                    // 2. Agregar la orden de Venta al contexto
+                    _context.Add(ordenVenta);
+                    await _context.SaveChangesAsync();
+
+                    var IdDeOrdenVenta = ordenVenta.Id;
+
+                    // 3. Agregar detalles de la orden de Venta
+                    foreach (OrdenVentaDetalle detalle in ordenVentaVM.OrdenVentaDetalle)
+                    {
+                       
+                            var ordenVentaDetalle = new OrdenVentaDetalle
+                            {
+                                OrdenVentaId = IdDeOrdenVenta,
+                                ProductoId = detalle.ProductoId,
+                                Codigo = detalle.Codigo,
+                                Nombre = detalle.Nombre,
+                                Cantidad = detalle.Cantidad,
+                                Precio = detalle.Precio / 100,
+                                Alicuota = detalle.Alicuota / 100,
+                                Iva = detalle.Iva / 100,
+                                Descuento = detalle.Descuento / 100,
+                            };
+
+                            _context.Add(ordenVentaDetalle);
+                        
+                      
+                    }
+
+                    // 5. Guardar los cambios en la base de datos
+                    await _context.SaveChangesAsync();
+
+                    // 6. Generar una fila en la tabla Stock
+                    if (ordenVentaVM.OrdenVenta.Estado == EstadoOrdenVenta.Procesada)
+                    {
+                        GenerarFilaStock(ordenVentaVM);
+                    }
+
+                    TempData["success"] = "Orden de Venta creada exitosamente!";
+
+                    return RedirectToAction("Ver", new { id = IdDeOrdenVenta });
+
+                    //return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    // Manejar excepciones aquí, realizar rollback si es necesario
+                    ModelState.AddModelError(string.Empty, $"Ocurrió un error al procesar la orden de Venta: {ex.Message}");
+                }
+
+            }
+
+            // Si llegamos aquí, significa que hubo un error, volvemos a mostrar el formulario con los errores.
+            ordenVentaVM.ClienteLista = _context.Cliente
+                .Select(p => new SelectListItem
+                {
+                    Value = p.Id.ToString(),
+                    Text = p.Nombre
+                });
+            ordenVentaVM.ProductoCodigoLista = _context.Producto
+                .Select(p => new SelectListItem
+                {
+                    Value = p.Codigo,
+                    Text = p.Codigo
+                });
+            ordenVentaVM.ProductoNombreLista = _context.Producto
+                .Select(p => new SelectListItem
+                {
+                    Value = p.Nombre,
+                    Text = p.Nombre
+                });
+
+            return View(ordenVentaVM);
+        }
 
 
+        //GET
+        public async Task<ActionResult> Ver(int id)
+        {
+            var ordenVenta = await _context.OrdenVenta
+                    .Include(o => o.Cliente)
+                    .Include(o => o.OrdenVentaDetalle)
+                    .ThenInclude(od => od.Producto)
+                    .FirstOrDefaultAsync(o => o.Id == id);
+            if (ordenVenta == null)
+            {
+                return NotFound();
+            }
+
+            // Crear un objeto OrdenVentaVM y asignar la orden recuperada
+            OrdenVentaVM ordenVentaVM = new()
+            {
+                OrdenVenta = ordenVenta,
+                OrdenVentaDetalle = ordenVenta.OrdenVentaDetalle,
+              
+            };
+
+            return View(ordenVentaVM);
+        }
+
+        public async Task<IActionResult> Eliminar(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var ordenVenta = await _context.OrdenVenta
+                .Include(o => o.Cliente) 
+                .FirstOrDefaultAsync(o => o.Id == id);
+
+            if (ordenVenta == null)
+            {
+                return NotFound();
+            }
+           
+            return View(ordenVenta);
+        }
+
+
+        // POST: OrdenVenta/Eliminar/{id}
+        [HttpPost, ActionName("Eliminar")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Eliminar(int id)
+        {
+            var ordenVenta = await _context.OrdenVenta.FindAsync(id);
+            var ordenVentaId = ordenVenta.NroOrdenVenta;
+            if (ordenVenta == null)
+            {
+                return NotFound();
+            }
+
+            // Elimina la orden de Venta
+            _context.OrdenVenta.Remove(ordenVenta);
+
+            // Elimina las filas de OrdenVentaDetalle que coincidan con el id
+            var ordenVentaDetalles = await _context.OrdenVentaDetalle
+                .Where(d => d.OrdenVentaId == ordenVentaId)
+                .ToListAsync();
+
+            _context.OrdenVentaDetalle.RemoveRange(ordenVentaDetalles);
+
+            await _context.SaveChangesAsync();
+             if (ordenVenta.Estado == EstadoOrdenVenta.Procesada)
+            {
+                return RedirectToAction(nameof(Index));
+
+            }
+            else
+            {
+                return RedirectToAction(nameof(Index), new RouteValueDictionary { { "presupuesto", true } });
+
+            }
+
+
+
+        }
         //////////////////////////////////////////////////////////////////////////////////
+
+        //Generar cambios en stock cuando se hace una venta
+        private void GenerarFilaStock(OrdenVentaVM viewModel)
+        {
+            foreach (var detalle in viewModel.OrdenVentaDetalle)
+            {
+                // Recuperar el producto correspondiente de la base de datos
+                var producto = _context.Producto.FirstOrDefault(p => p.Id == detalle.ProductoId);
+
+                if (producto != null)
+                {
+                    // Actualizar el stock del producto
+                    producto.Stock -= detalle.Cantidad;
+
+                    // Crear y guardar la entrada en la tabla Stock
+                    var nuevaEntradaStock = new Stock
+                    {
+                        ProductoId = detalle.ProductoId,
+                        Cantidad = detalle.Cantidad,
+                        Fecha = viewModel.FechaActual,
+                        Concepto = "Ventas",
+                        NroComprobante = "Rto. Nro: " + viewModel.OrdenVenta.NroOrdenVenta.ToString()
+
+                    };
+
+                    _context.Stock.Add(nuevaEntradaStock);
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    TempData["error"] = "No se encontró el Producto con el Id indicado";
+                    continue;
+
+                }
+            }
+        }
 
         // Función para obtener el último número de orden
         private int ObtenerUltimoNumeroOrden()
