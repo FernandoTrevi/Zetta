@@ -1,0 +1,38 @@
+﻿@model List<OrdenVenta>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>N° Presup.</th>               
+                <th>Fecha</th>
+                <th>Vendedor</th>
+                <th>Monto total</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var orden in Model)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox" name="selectedOrders" value="@orden.Id" />
+                    </td>
+                    <td>@orden.NroOrdenVenta</td>
+                    <td>@orden.Fecha.ToShortDateString()</td>
+                    <td>@orden.Vendedor</td>
+                    <td>@orden.TotalOrden</td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No hay órdenes de compra para mostrar.</p>
+}
+
+

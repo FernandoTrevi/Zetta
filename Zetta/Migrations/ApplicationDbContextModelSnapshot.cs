@@ -240,7 +240,7 @@ namespace Zetta.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categoria");
+                    b.ToTable("Categoria", (string)null);
                 });
 
             modelBuilder.Entity("Zetta.Models.Cliente", b =>
@@ -285,7 +285,7 @@ namespace Zetta.Migrations
 
                     b.HasIndex("ProvinciaId");
 
-                    b.ToTable("Cliente");
+                    b.ToTable("Cliente", (string)null);
                 });
 
             modelBuilder.Entity("Zetta.Models.CondIva", b =>
@@ -301,7 +301,7 @@ namespace Zetta.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CondIva");
+                    b.ToTable("CondIva", (string)null);
                 });
 
             modelBuilder.Entity("Zetta.Models.Marca", b =>
@@ -318,7 +318,7 @@ namespace Zetta.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Marca");
+                    b.ToTable("Marca", (string)null);
                 });
 
             modelBuilder.Entity("Zetta.Models.OrdenCompra", b =>
@@ -348,7 +348,7 @@ namespace Zetta.Migrations
 
                     b.HasIndex("ProveedorId");
 
-                    b.ToTable("OrdenCompra");
+                    b.ToTable("OrdenCompra", (string)null);
                 });
 
             modelBuilder.Entity("Zetta.Models.OrdenCompraDetalle", b =>
@@ -385,7 +385,7 @@ namespace Zetta.Migrations
 
                     b.HasIndex("ProductoId");
 
-                    b.ToTable("OrdenCompraDetalle");
+                    b.ToTable("OrdenCompraDetalle", (string)null);
                 });
 
             modelBuilder.Entity("Zetta.Models.OrdenVenta", b =>
@@ -433,7 +433,7 @@ namespace Zetta.Migrations
 
                     b.HasIndex("ClienteId");
 
-                    b.ToTable("OrdenVenta");
+                    b.ToTable("OrdenVenta", (string)null);
                 });
 
             modelBuilder.Entity("Zetta.Models.OrdenVentaDetalle", b =>
@@ -479,7 +479,7 @@ namespace Zetta.Migrations
 
                     b.HasIndex("ProductoId");
 
-                    b.ToTable("OrdenVentaDetalle");
+                    b.ToTable("OrdenVentaDetalle", (string)null);
                 });
 
             modelBuilder.Entity("Zetta.Models.Producto", b =>
@@ -538,7 +538,7 @@ namespace Zetta.Migrations
 
                     b.HasIndex("MarcaId");
 
-                    b.ToTable("Producto");
+                    b.ToTable("Producto", (string)null);
                 });
 
             modelBuilder.Entity("Zetta.Models.Proveedor", b =>
@@ -591,7 +591,7 @@ namespace Zetta.Migrations
 
                     b.HasIndex("ProvinciaId");
 
-                    b.ToTable("Proveedor");
+                    b.ToTable("Proveedor", (string)null);
                 });
 
             modelBuilder.Entity("Zetta.Models.Provincia", b =>
@@ -607,7 +607,7 @@ namespace Zetta.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Provincia");
+                    b.ToTable("Provincia", (string)null);
                 });
 
             modelBuilder.Entity("Zetta.Models.Stock", b =>
@@ -637,7 +637,7 @@ namespace Zetta.Migrations
 
                     b.HasIndex("ProductoId");
 
-                    b.ToTable("Stock");
+                    b.ToTable("Stock", (string)null);
                 });
 
             modelBuilder.Entity("Zetta.Models.UsuarioAplicacion", b =>

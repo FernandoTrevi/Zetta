@@ -43,6 +43,8 @@ namespace Zetta.Models
         [Required]
         public double Iva { get; set; }
 
+        public double PrecioConIva => Precio * (Iva / 100);
+
         public int Stock { get; set; }
 
         public int StockMinimo { get; set; }

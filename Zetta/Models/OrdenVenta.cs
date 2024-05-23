@@ -14,6 +14,7 @@ namespace Zetta.Models
 
         public DateTime Vencimiento { get; set; }
 
+
         public string CondicionPago { get; set; }
 
         // Relación con el Cliente

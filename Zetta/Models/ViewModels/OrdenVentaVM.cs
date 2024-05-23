@@ -19,5 +19,6 @@ namespace Zetta.Models.ViewModels
         public decimal? ProductoDescuento { get; set; }
         public decimal? ProductoIva { get; set; }
         public decimal? ProductoPrecio { get; set; }
+        
     }
 }

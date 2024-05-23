@@ -5,18 +5,26 @@
 }
 
 <div class="container">
-    @if (Model.OrdenVenta.Estado == EstadoOrdenVenta.Procesada)
+
+    @switch (Model.OrdenVenta.Estado)
     {
-        <div class="p-3 bg-info bg-opacity-10 border border-info border-start-0 rounded-end">
-            <h3>Remito</h3>
-        </div>
+    case EstadoOrdenVenta.Procesada:
+        <div class="p-3 bg-success bg-opacity-10 border border-success border-start-0 rounded-end">
+        <h3>Remito</h3>
+    </div>
+    break;
+    case EstadoOrdenVenta.Vencida:
+        <div class="p-3 bg-danger bg-opacity-10 border border-danger border-start-0 rounded-end">
+        <h3>Presupuesto Vencido</h3>
+    </div>
+    break;
+    default:
+    <div class="p-3 bg-info bg-opacity-10 border border-info border-start-0 rounded-end">
+        <h3>Presupuesto</h3>
+    </div>
+    break;
     }
-    else
-    {
-        <div class="p-3 bg-info bg-opacity-10 border border-info border-start-0 rounded-end">
-            <h3>Presupuesto</h3>
-        </div>
-    }
+
     
 
         <div class="row mt-2 border-bottom border-black">
@@ -69,12 +77,20 @@
                             <th>Código</th>
                             <th>Producto</th>
                             <th>Cantidad</th>
+                        @if (Model.OrdenVenta.Cliente.CondIvaId == 1)
+                        {
                             <th>Precio Unit.</th>
                             <th>% Bonif.</th>
                             <th>Subtotal</th>
                             <th>Alicuota IVA</th>
                             <th>Subtotal C/IVA</th>
-                        </tr>
+                        }else{
+                            <th>Precio Unit.</th>
+                            <th>% Bonif.</th>
+                            <th>Subtotal</th>
+
+                        }
+                    </tr>
                     </thead>
 
                     <tbody>
@@ -84,12 +100,21 @@
                                 <td>@detalle.Producto.Codigo</td>
                                 <td>@detalle.Producto.Nombre</td>
                                 <td class="text-center">@detalle.Cantidad</td>
+                            @if (Model.OrdenVenta.Cliente.CondIvaId == 1)
+                            {
                                 <td class="text-end">@detalle.Precio</td>
                                 <td class="text-center">@detalle.Descuento</td>
                                 <td class="text-end">@detalle.Subtotal</td>
                                 <td class="text-center">@detalle.Alicuota</td>
                                 <td class="text-end">@detalle.TotalDetalle</td>
 
+                            }else{
+                                <td class="text-end">@detalle.PrecioConIva</td>
+                                <td class="text-center">@detalle.Descuento</td>
+                                <td class="text-end">@detalle.TotalDetalleCF</td>
+
+                            }
+                               
                             </tr>
                         }
                     @for (int i = 0; i < (8 - Model.OrdenVentaDetalle.Count); i++)
@@ -101,12 +126,19 @@
                             <td class="text-center"></td>
                             <td class="text-center"></td>
                             <td class="text-center"></td>
-                            <td class="text-center"></td>
-                            <td class="text-center"></td>
+                            @if (Model.OrdenVenta.Cliente.CondIvaId == 1)
+                            {
+                                <td class="text-center"></td>
+                                <td class="text-center"></td>
+                            }
+
+                            
                         </tr>
                     }
                     </tbody>
                     <tfoot>
+                    @if (Model.OrdenVenta.Cliente.CondIvaId == 1)
+                    {
                         <tr>
                             <td colspan="5"></td>
                             <td colspan="2"><strong>Subtotal: </strong></td>
@@ -127,6 +159,15 @@
                             <td colspan="2"><strong>Total a pagar: </strong></td>
                             <td class="text-lg-end"><span>@Model.OrdenVenta.TotalOrden</span></td>
                         </tr>
+                    }else{
+                        <tr>
+                            <td colspan="3"></td>
+                            <td colspan="2"><strong>Total a pagar: </strong></td>
+                            <td class="text-lg-end"><span>@Model.OrdenVenta.TotalOrden</span></td>
+                        </tr>
+                    }
+
+                   
                     </tfoot>
                 </table>
             </div>

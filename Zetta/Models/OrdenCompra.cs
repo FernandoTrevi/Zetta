@@ -27,6 +27,8 @@ namespace Zetta.Models
 
         // Propiedad calculada para el total de la orden de compra
         public decimal TotalOrden => OrdenCompraDetalle?.Sum(detalle => detalle.Total) ?? 0;
+
+
     }
 
     public enum EstadoOrden

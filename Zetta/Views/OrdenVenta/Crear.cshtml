@@ -64,7 +64,7 @@
         <div class="row">
             <div class="col-md-6">
                 <label asp-for="OrdenVenta.ClienteId" class="form-label">Cliente</label>
-                <select asp-for="OrdenVenta.ClienteId" asp-items="@Model.ClienteLista" class="form-select">
+                <select asp-for="OrdenVenta.ClienteId" asp-items="@Model.ClienteLista" id="OrdenVenta_ClienteId" class="form-select" onchange="showButton()">
                     <option disabled selected>--Seleccione un Cliente</option>
                 </select>
                 <span asp-validation-for="OrdenVenta.ClienteId" class="text-danger"></span>
@@ -97,6 +97,8 @@
         </div>
         <br />
         <h3 class="text-info">Agregar detalles</h3>
+        <div id="presupuestoButtonPlaceholder"></div> 
+
         <hr />
         <br />
 
@@ -233,10 +235,28 @@
 
 
 </div>
+<!-- El modal en tu vista principal -->
+<div class="modal fade" id="ordenesCompraModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Presupuestos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal-body-content">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="addSelectedOrdersButton">Agregar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts{
     @{
-        <partial name="_ValidationScriptsPartial" />
+            <partial name="_ValidationScriptsPartial" />
     }
     <script>
         var productos = @Html.Raw(Json.Serialize(Model.Productos))
@@ -254,6 +274,8 @@
             var subtotalConIva = subtotalConDescuento * (iva / 100);
             var totalDetalle = subtotalConDescuento + subtotalConIva;
 
+
+            
 
             // Verificar si el producto ya existe en la tabla
             var productosEnTabla = $("#tablaDetalle tbody tr td:eq(1)").map(function () {
@@ -422,39 +444,128 @@
             
         }
 
+        function showButton() {
+            // Vaciar las variables al comienzo de la función
+            var clientSelect = document.getElementById('OrdenVenta_ClienteId');
+            var selectedClient = null;
+            var placeholder = document.getElementById('presupuestoButtonPlaceholder');
+            var presupuesto = null;
 
+            // Verificar si se ha seleccionado un cliente y obtener su nombre
+            if (clientSelect.selectedIndex !== -1) {
+                selectedClient = clientSelect.options[clientSelect.selectedIndex].text;
+            }
+
+            // Obtener el valor de la variable de presupuesto
+            presupuesto = @Html.Raw(Json.Serialize(ViewData["Presupuesto"]));
+
+            // Verificar si el cliente está seleccionado y si presupuesto no es true
+            if (clientSelect.value && !presupuesto) {
+                placeholder.innerHTML = `<button type="button" class="btn btn-info" onclick="viewPresupuestos()">Ver Presupuestos de ${selectedClient}</button>`;
+            } else {
+                placeholder.innerHTML = '';
+            }
+        }
+
+        function viewPresupuestos() {
+            var clientSelect = document.getElementById('OrdenVenta_ClienteId');
+            var clientId = clientSelect.value;
+
+            // Llamar al método en el controlador para cargar las órdenes de compra del cliente
+            $.get('/OrdenVenta/OrdenesCompraCliente', { clienteId: clientId })
+                .done(function (data) {
+                    // Reemplazar el contenido del modal con la vista parcial
+                    $('#modal-body-content').html(data);
+                   
+
+                    $('#ordenesCompraModal').modal('show');
+                })
+                .fail(function () {
+                    alert('Error al cargar las órdenes de compra.');
+                });
+        }
+        document.getElementById('addSelectedOrdersButton').addEventListener('click', function () {
+            let selectedOrders = [];
+            document.querySelectorAll('input[name="selectedOrders"]:checked').forEach((checkbox) => {
+                selectedOrders.push(checkbox.value);
+            });
+
+            if (selectedOrders.length > 0) {
+                fetch('/OrdenVenta/GetDetallesOrdenes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(selectedOrders)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Limpiar la tabla antes de agregar los nuevos datos
+                        $("#tablaDetalle tbody").empty();
+                        data.forEach(detalle => {
+                            console.log("detalle", detalle);
+                            // Llenar los campos con los datos del detalle
+                            $("#ProductoCodigo").val(detalle.codigo);
+                            $("#ProductoNombre").val(detalle.nombre);
+                            $("#ProductoCantidad").val(detalle.cantidad);
+                            $("#ProductoPrecio").val(detalle.precio);
+                            $("#ProductoDescuento").val(detalle.descuento);
+                            $("#ProductoIva").val(detalle.alicuota);
+
+                            // Llamar a la función AgregarDetalle para agregar la fila a la tabla
+                            AgregarDetalle();
+                        });
+                        $('#ordenesCompraModal').modal('hide');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            } else {
+                alert('No has seleccionado ninguna orden.');
+            }
+        });
+
+       
     </script>
 
     <script>
-        document.getElementById('diasValidez').addEventListener('input', function () {
-            // Obtener el valor de días de validez
-            var diasValidez = parseInt(this.value);
+        // Obtener el valor de la variable de presupuesto
+        var presupuesto = @Html.Raw(Json.Serialize(ViewData["Presupuesto"]));
 
-            // Obtener la fecha actual
-            var fechaActual = new Date('@Model.FechaActual.ToString("yyyy-MM-dd")');
+        // Verificar si el cliente está seleccionado y si presupuesto no es true
+        if (presupuesto) {
+            document.getElementById('diasValidez').addEventListener('input', function () {
+                // Obtener el valor de días de validez
+                var diasValidez = parseInt(this.value);
 
-            // Calcular la fecha de vencimiento sumando los días de validez a la fecha actual
-            var fechaVencimiento = new Date(fechaActual);
-            fechaVencimiento.setDate(fechaVencimiento.getDate() + diasValidez);
+                // Obtener la fecha actual
+                var fechaActual = new Date('@Model.FechaActual.ToString("yyyy-MM-dd")');
 
-            // Formatear la fecha de vencimiento
-            var fechaVencimientoFormateada = fechaVencimiento.getFullYear() + '-' + ('0' + (fechaVencimiento.getMonth() + 1)).slice(-2) + '-' + ('0' + fechaVencimiento.getDate()).slice(-2);
+                // Calcular la fecha de vencimiento sumando los días de validez a la fecha actual
+                var fechaVencimiento = new Date(fechaActual);
+                fechaVencimiento.setDate(fechaVencimiento.getDate() + diasValidez);
 
-            // Establecer el valor del campo de vencimiento
-            document.getElementById('fechaVencimiento').value = fechaVencimientoFormateada;
-        });
-        // Disparar el evento input para calcular el vencimiento inicialmente con el valor predeterminado
-        document.getElementById('diasValidez').dispatchEvent(new Event('input'));
-        
+                // Formatear la fecha de vencimiento
+                var fechaVencimientoFormateada = fechaVencimiento.getFullYear() + '-' + ('0' + (fechaVencimiento.getMonth() + 1)).slice(-2) + '-' + ('0' + fechaVencimiento.getDate()).slice(-2);
+
+                // Establecer el valor del campo de vencimiento
+                document.getElementById('fechaVencimiento').value = fechaVencimientoFormateada;
+            });
+            // Disparar el evento input para calcular el vencimiento inicialmente con el valor predeterminado
+            document.getElementById('diasValidez').dispatchEvent(new Event('input'));
+        }
         
         
 
     </script>
     <script>
         $(function () {
-            // Obtener los datos de productos disponibles
-            //var productos = @Html.Raw(Json.Serialize(Model.Productos));
-
+         
             function actualizarCampos(codigoSeleccionado, nombreSeleccionado) {
                
                 // Si se cambió el producto

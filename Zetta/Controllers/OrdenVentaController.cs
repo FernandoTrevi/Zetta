@@ -97,7 +97,6 @@ namespace Zetta.Controllers
                 // Inicializa la lista de detalles como una lista vacía
                 OrdenVentaDetalle = new List<OrdenVentaDetalle>(),
 
-                UsuarioAplicacion = new UsuarioAplicacion { }
             };
 
             return View(ordenVentaVM);
@@ -336,5 +335,37 @@ namespace Zetta.Controllers
             // Si no hay órdenes en la base de datos, inicia en 1
             return 1;
         }
+        public IActionResult OrdenesCompraCliente(int clienteId)
+        {
+            var ordenesCompraCliente = _context.OrdenVenta
+                                            .Where(o => o.ClienteId == clienteId && o.Estado == EstadoOrdenVenta.Presupuesto)
+                                            .ToList();
+
+            return PartialView("_OrdenesCompraCliente", ordenesCompraCliente);
+        }
+        [HttpPost]
+        public IActionResult GetDetallesOrdenes([FromBody] List<int> ordenesIds)
+        {
+            if (ordenesIds == null || !ordenesIds.Any())
+            {
+                return BadRequest(new { message = "No se han recibido IDs de órdenes." });
+            }
+
+            var detalles = _context.OrdenVentaDetalle
+                                   .Where(d => ordenesIds.Contains(d.OrdenVentaId))
+                                   .Select(d => new
+                                   {
+                                       d.Codigo,
+                                       d.Nombre,
+                                       d.Cantidad,
+                                       d.Precio,
+                                       d.Descuento,
+                                       d.Alicuota,
+                                   })
+                                   .ToList();
+
+            return Json(detalles);
+        }
+
     }
 }
