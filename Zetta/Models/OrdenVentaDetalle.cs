@@ -41,9 +41,9 @@ namespace Zetta.Models
 
         public decimal PrecioConIva => Math.Round(Precio + (Precio * (Alicuota / 100)), 2);
 
-        public decimal Subtotal => Cantidad * Precio * (1 - (Descuento / 100));
+        public decimal Subtotal => Math.Round(Cantidad * Precio * (1 - (Descuento / 100)), 2);
 
-        public decimal TotalDetalle => Subtotal + (Alicuota / 100);
+        public decimal TotalDetalle => Math.Round(Subtotal + (Subtotal * (Alicuota / 100)),2);
 
         public decimal TotalDetalleCF => Math.Round(Cantidad * PrecioConIva * (1 - (Descuento / 100)), 2);
 

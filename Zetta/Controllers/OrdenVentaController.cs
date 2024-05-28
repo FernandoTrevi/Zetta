@@ -205,7 +205,7 @@ namespace Zetta.Controllers
         public async Task<ActionResult> Ver(int id)
         {
             var ordenVenta = await _context.OrdenVenta
-                    .Include(o => o.Cliente)
+                    .Include(o => o.Cliente).ThenInclude(c => c.CondIva )
                     .Include(o => o.OrdenVentaDetalle)
                     .ThenInclude(od => od.Producto)
                     .FirstOrDefaultAsync(o => o.Id == id);

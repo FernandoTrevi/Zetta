@@ -58,7 +58,7 @@
                 <p style="margin-bottom: 1px;"><strong>E-mail:</strong> @Model.OrdenVenta.Cliente.Email</p>
             </div>
             <div class="col-sm-6">
-                <!-- Datos de Entrega -->
+                <p style="margin-bottom: 1px;"><strong>IVA:</strong> @Model.OrdenVenta.Cliente.CondIva.Nombre</p>
                 <p style="margin-bottom: 1px;"><strong>Vendedor:</strong> @Model.OrdenVenta.Vendedor</p>
                 <p style="margin-bottom: 1px;"><strong>Condición de pago:</strong> @Model.OrdenVenta.CondicionPago</p>
                 <p style="margin-bottom: 1px;"><strong>Observaciones:</strong> @Model.OrdenVenta.Observaciones</p>
@@ -119,7 +119,7 @@
                         }
                     @for (int i = 0; i < (8 - Model.OrdenVentaDetalle.Count); i++)
                     {
-                        <tr class="d-print-none" style="height: 30px;">
+                        <tr style="height: 30px;">
                             <td></td>
                             <td></td>
                             <td class="text-center"></td>
@@ -197,9 +197,29 @@
 @section Scripts {
     <script>
         document.getElementById("printButton").addEventListener("click", function () {
+            document.body.classList.add('print-mode');
             window.print();
+            document.body.classList.remove('print-mode');
         });
     </script>
-     
 }
 
+
+<style>
+    .print-mode {
+        font-size: 12px; /* Ajusta el tamaño de fuente según sea necesario */
+    }
+
+        .print-mode .table th,
+        .print-mode .table td {
+            font-size: 10px; /* Ajusta el tamaño de fuente de las celdas de la tabla */
+        }
+
+        .print-mode h5,
+        .print-mode h4,
+        .print-mode strong {
+            font-size: 14px; /* Ajusta el tamaño de fuente de los encabezados y textos en negrita */
+        }
+
+    /* Otros estilos específicos para la impresión */
+</style>

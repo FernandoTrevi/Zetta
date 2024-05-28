@@ -93,21 +93,21 @@
                 @if (Model.PaginasAnteriores)
                 {
                     <li class="page-item">
-                        <a class="page-link" href="@Url.Action("Index", new { numpag = Model.PaginaInicio - 1, filtroActual = ViewData["FiltroActual"] })">Anterior</a>
+                        <a class="page-link" href="@Url.Action("Index", new { numpag = Model.PaginaInicio - 1, filtroActual = ViewData["FiltroActual"], presupuesto = true  })">Anterior</a>
                     </li>
                 }
 
                 @for (int i = 1; i <= Model.PaginasTotales; i++)
                 {
                     <li class="page-item @(i == Model.PaginaInicio ? "active" : "")">
-                        <a class="page-link" href="@Url.Action("Index", new { numpag = i, filtroActual = ViewData["FiltroActual"] })">@i</a>
+                        <a class="page-link" href="@Url.Action("Index", new { numpag = i, filtroActual = ViewData["FiltroActual"] , presupuesto = true })">@i</a>
                     </li>
                 }
 
                 @if (Model.PaginasPosteriores)
                 {
                     <li class="page-item">
-                        <a class="page-link" href="@Url.Action("Index", new { numpag = Model.PaginaInicio + 1, filtroActual = ViewData["FiltroActual"] })">Siguiente</a>
+                        <a class="page-link" href="@Url.Action("Index", new { numpag = Model.PaginaInicio + 1, filtroActual = ViewData["FiltroActual"], presupuesto = true  })">Siguiente</a>
                     </li>
                 }
             </ul>
@@ -123,4 +123,10 @@
 
 </div>
 
-
+@section Scripts {
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+}

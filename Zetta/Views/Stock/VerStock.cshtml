@@ -32,8 +32,8 @@
             @foreach (var movimiento in Model.Movimientos)
             {
                 <tr >
-                    <td>@movimiento.Fecha</td>
-                    <td style="text-align: right;">
+                        <td>@movimiento.Fecha.ToString("dd/MM/yyyy")</td>
+                        <td style="text-align: right;">
                         @movimiento.Cantidad
                         @if (movimiento.Concepto == "Ingreso de producto" || movimiento.Concepto == "Compras" || movimiento.Concepto == "Devoluciones")
                         {
