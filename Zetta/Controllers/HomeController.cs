@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SendGrid.Helpers.Mail;
 using System.Diagnostics;
 using Zetta.Datos;
 using Zetta.Models;
@@ -83,6 +84,71 @@ namespace Zetta.Controllers
             return RedirectToAction(nameof(Index));
 
         }
+
+
+        /// <summary>
+        /// Graficos
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public JsonResult GetProductosMasVendidos()
+        {
+            var productosMasVendidos = _db.OrdenVentaDetalle
+                .Include(o => o.OrdenVenta) // Incluimos la entidad OrdenVenta para acceder al estado de la venta
+                .Where(o => o.OrdenVenta.Estado == EstadoOrdenVenta.Procesada) // Filtramos solo las ventas en estado "Procesada"
+                .GroupBy(o => new { o.ProductoId, o.Nombre })
+                .Select(g => new
+                {
+                    Producto = g.Key.Nombre,
+                    CantidadVendida = g.Sum(o => o.Cantidad)
+                })
+                .OrderByDescending(g => g.CantidadVendida)
+                .Take(5)
+                .ToList();
+
+            return Json(productosMasVendidos);
+        }
+
+        [HttpGet]
+        public JsonResult GetVentasMensuales()
+        {
+            var ventasMensuales = _db.OrdenVentaDetalle
+                 .Include(o => o.OrdenVenta) // Incluimos la entidad OrdenVenta para acceder a la fecha
+                 .Where(o => o.OrdenVenta.Estado == EstadoOrdenVenta.Procesada) // Filtramos solo las ventas en estado "Procesada"
+                 .ToList() // Traemos todos los datos al cliente para hacer la agrupación y suma
+                 .GroupBy(o => new { Mes = o.OrdenVenta.Fecha.Month, Anio = o.OrdenVenta.Fecha.Year })
+                 .Select(g => new
+                 {
+                     Mes = g.Key.Mes,
+                     Anio = g.Key.Anio,
+                     VentasTotales = g.Sum(o => o.TotalDetalle)
+                 })
+                 .OrderBy(g => g.Anio)
+                 .ThenBy(g => g.Mes)
+                 .ToList();
+
+            return Json(ventasMensuales);
+        }
+
+        [HttpGet]
+        public JsonResult GetCondicionesDePago()
+        {
+            var condicionesDePago = _db.OrdenVenta
+                .Where(o => o.Estado == EstadoOrdenVenta.Procesada && o.CondicionPago != null) // Filtramos solo las ventas en estado "Procesada"
+                .GroupBy(o => o.CondicionPago)
+                .Select(g => new
+                {
+                    CondicionPago = g.Key,
+                    Cantidad = g.Count()
+                })
+                .ToList();
+
+            return Json(condicionesDePago);
+        }
+
+
+
+
 
         public IActionResult Privacy()
         {

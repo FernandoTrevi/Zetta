@@ -17,11 +17,11 @@
             <div class="row">
                 <div class="col-md-6">
                     <label asp-for="NroOrden" class="form-label">Nro de Orden</label>
-                    <input asp-for="NroOrden" disable class="form-control" />
+                    <input asp-for="NroOrden" disable class="form-control" disabled readonly />
                 </div>
                 <div class="col-md-6">
                     <label asp-for="Fecha" class="form-label">Fecha</label>
-                    <input type="text" class="form-control" asp-for="Fecha" value="@Model.Fecha.ToString("dd-MM-yyyy")" readonly />
+                    <input type="text" class="form-control" asp-for="Fecha" value="@Model.Fecha.ToString("dd-MM-yyyy")" disabled readonly />
                 </div>
 
             </div>
@@ -31,11 +31,11 @@
                 <div class="col-md-6">
                     <label asp-for="Proveedor" class="form-label">Proveedor</label>
                     <input asp-for="ProveedorId" hidden class="form-control" />
-                    <input asp-for="Proveedor.Razonsocial" disabled class="form-control" />
+                    <input asp-for="Proveedor.Razonsocial" disabled class="form-control" readonly />
                 </div>
                 <div class="col-md-6">
                     <label asp-for="Observaciones" class="form-label">Observaciones</label>
-                    <input asp-for="Observaciones" disable class="form-control" />
+                    <input type="text" asp-for="Observaciones" disabled class="form-control" readonly />
                 </div>
             </div>
             <br />

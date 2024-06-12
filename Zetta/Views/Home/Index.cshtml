@@ -1,13 +1,26 @@
 ﻿@model Zetta.Models.ViewModels.HomeVM
 
 <div class="container">
-    <div class="row">
+    @if (User.IsInRole(WC.AdminRole))
+    {
+        <button id="toggle-admin-view" class="btn btn-primary mb-3">Ver Página Pública</button>
+
+        <div id="admin-content">
+        <h1>Dashboard de Ventas</h1>
+        
+            <div id="productos_mas_vendidos_chart" style="width: 600px; height: 400px;"></div>
+            <div id="ventas_mensuales_chart" style="width: 600px; height: 400px;"></div>
+            <div id="condiciones_pago_chart" style="width: 600px; height: 400px;"></div>
+        </div>
+    }
+
+    <div class="row" id="public-content">
         <div class="col-md-3">
             <div class="btn-group-vertical">
                 <button class="btn btn-dark btn-sm filter-button" data-filter="all">Todos</button>
                 @foreach (var cat in Model.Categorias)
                 {
-                    <button class="btn btn-outline-secondary btn-sm filter-button" data-filter="@cat.Nombre.Replace(' ','_')">@cat.Nombre</button>
+                    <button class="btn btn-outline-secondary btn-sm filter-button" data-filter="@cat.Nombre.Replace(' ', '_')">@cat.Nombre</button>
                 }
             </div>
         </div>
@@ -22,28 +35,154 @@
                 }
             </div>
         </div>
-
     </div>
 </div>
 
-@section Scripts{
+@section Scripts {
     <script>
         $(document).ready(function () {
-
             $(".filter-button").click(function () {
-
                 var value = $(this).attr('data-filter');
                 if (value == "all") {
                     $('.filter').show('1000');
-                }
-                else {
+                } else {
                     $(".filter").not('.' + value).hide('3000');
                     $('.filter').filter('.' + value).show('3000');
-
                 }
             });
-
+        @if (User.IsInRole(WC.AdminRole))
+        {
+            // Oculta el contenido público si el usuario es un administrador
+            @:$("#public-content").hide();
+        }
+            $("#toggle-admin-view").click(function () {
+                if ($("#admin-content").is(":visible")) {
+                    // Si el contenido administrativo está visible, ocúltalo y muestra el contenido público
+                    $("#admin-content").hide();
+                    $("#public-content").show();
+                    $(this).text("Ver Dashboard de Ventas"); // Cambia el texto del botón
+                } else {
+                    // Si el contenido administrativo está oculto, muéstralo y oculta el contenido público
+                    $("#admin-content").show();
+                    $("#public-content").hide();
+                    $(this).text("Ver Página Pública"); // Cambia el texto del botón
+                    // Inicializa los gráficos después de cambiar la visibilidad
+                    drawCharts();
+                }
+            });
+           
         });
+
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.charts.setOnLoadCallback(drawCharts);
+
+        function drawCharts() {
+            drawProductosMasVendidos();
+            drawVentasMensuales();
+            drawCondicionesDePago();
+        }
+
+        function drawProductosMasVendidos() {
+            $.ajax({
+                url: '@Url.Action("GetProductosMasVendidos", "Home")',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    var dataTable = new google.visualization.DataTable();
+                    dataTable.addColumn('string', 'Producto');
+                    dataTable.addColumn('number', 'Cantidad Vendida');
+                    data.forEach(function (item) {
+                        dataTable.addRow([item.producto, item.cantidadVendida]);
+                    });
+
+                    var options = {
+                        title: 'Top 5 Productos Más Vendidos',
+                        width: 600,
+                        height: 400,
+                        hAxis: { title: 'Producto' },
+                        vAxis: { title: 'Cantidad Vendida' },
+                        titleTextStyle: {
+                            fontSize: 18, // Tamaño de la fuente del título
+                            fontName: 'Arial' // Fuente del título
+                        },
+                    };
+
+                    var chart = new google.visualization.ColumnChart(document.getElementById('productos_mas_vendidos_chart'));
+                    chart.draw(dataTable, options);
+                },
+                error: function (error) {
+                    console.error("Error al obtener los datos: ", error);
+                }
+            });
+        }
+
+        function drawVentasMensuales() {
+            $.ajax({
+                url: '@Url.Action("GetVentasMensuales", "Home")',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    var dataTable = new google.visualization.DataTable();
+                    dataTable.addColumn('string', 'Mes');
+                    dataTable.addColumn('number', 'Ventas Totales');
+                    data.forEach(function (item) {
+                        var mesAnio = item.mes + '/' + item.anio;
+                        dataTable.addRow([mesAnio, item.ventasTotales]);
+                    });
+
+                    var options = {
+                        title: 'Ventas Mensuales',
+                        width: 600,
+                        height: 400,
+                        hAxis: { title: 'Mes' },
+                        vAxis: { title: 'Ventas Totales' },
+                        titleTextStyle: {
+                            fontSize: 18, // Tamaño de la fuente del título
+                            fontName: 'Arial' // Fuente del título
+                        },
+                    };
+
+                    var chart = new google.visualization.ColumnChart(document.getElementById('ventas_mensuales_chart'));
+                    chart.draw(dataTable, options);
+                },
+                error: function (error) {
+                    console.error("Error al obtener los datos: ", error);
+                }
+            });
+        }
+
+        function drawCondicionesDePago() {
+            $.ajax({
+                url: '@Url.Action("GetCondicionesDePago", "Home")',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    var dataTable = new google.visualization.DataTable();
+                    dataTable.addColumn('string', 'Condición de Pago');
+                    dataTable.addColumn('number', 'Cantidad');
+                    data.forEach(function (item) {
+                        dataTable.addRow([item.condicionPago, item.cantidad]);
+                    });
+
+                    var options = {
+                        title: 'Condiciones de Pago (Cantidad de Ventas)',
+                        width: 600,
+                        height: 400,
+                        is3D: true,
+                        titleTextStyle: {
+                            fontSize: 18, // Tamaño de la fuente del título
+                            fontName: 'Arial' // Fuente del título
+                        }
+                    };
+
+                    var chart = new google.visualization.PieChart(document.getElementById('condiciones_pago_chart'));
+                    chart.draw(dataTable, options);
+                },
+                error: function (error) {
+                    console.error("Error al obtener los datos: ", error);
+                }
+            });
+        }
     </script>
 }
 
