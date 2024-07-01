@@ -15,6 +15,7 @@ namespace Zetta.Models
 
         public int Cantidad { get; set; }
 
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         public DateTime Fecha { get; set; }
 
         public string Concepto { get; set; }

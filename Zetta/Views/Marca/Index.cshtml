@@ -6,7 +6,19 @@
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+@{
+    int maxPagesToShow = 5;
+    int currentPage = Model.PaginaInicio;
+    int totalPages = Model.PaginasTotales;
 
+    int startPage = Math.Max(1, currentPage - (maxPagesToShow / 2));
+    int endPage = Math.Min(totalPages, startPage + maxPagesToShow - 1);
+
+    if (endPage - startPage + 1 < maxPagesToShow)
+    {
+        startPage = Math.Max(1, endPage - maxPagesToShow + 1);
+    }
+}
 <div class="container p-2">
     <div class="row p-2">
         <div class="col-6">
@@ -79,7 +91,7 @@
                     </li>
                 }
 
-                @for (int i = 1; i <= Model.PaginasTotales; i++)
+                @for (int i = startPage; i <= endPage; i++)
                 {
                     <li class="page-item @(i == Model.PaginaInicio ? "active" : "")">
                         <a class="page-link" href="@Url.Action("Index", new { numpag = i, filtroActual = ViewData["FiltroActual"] })">@i</a>
