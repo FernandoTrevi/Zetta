@@ -166,7 +166,7 @@ namespace Zetta1.Controllers
         }
         private List<Stock> GetMovimientosByProductoId(int productoId)
         {
-            return _context.Stock.Where(s => s.ProductoId == productoId).ToList();
+            return _context.Stock.Where(s => s.ProductoId == productoId).OrderByDescending(s => s.Fecha).ToList();
         }
     }
 }
